@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>METRIA — Registro Técnico de Campo Por Adauri Alves</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;max-width:100%;overflow-x:hidden}
+body{font:16px/1.45 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#0f172a;padding-bottom:env(safe-area-inset-bottom)}
+[hidden]{display:none!important}
+.topo{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0f172a;color:#fff;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top))}
+.marca{font-weight:800;font-size:18px;letter-spacing:.5px}
+.marca .sub{font-weight:400;font-size:11px;opacity:.75;display:block}
+.save{font-size:12px;background:#1e293b;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
+.tab{flex:1 1 auto;min-height:42px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:10px;font-size:14px;font-weight:600;padding:6px 10px;cursor:pointer;touch-action:manipulation}
+.tab.ativo{background:#0b57d0;border-color:#0b57d0;color:#fff}
+.badge{background:rgba(0,0,0,.15);border-radius:999px;padding:1px 7px;font-size:12px}
+main{max-width:none;margin:0;padding:8px}
+#tab-fotos,#tab-dados,#tab-relatorio,#tab-ajuda{max-width:760px;margin:0 auto}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.fer{flex:1 1 auto;min-height:44px;border:1px solid #cbd5e1;background:#fff;border-radius:10px;font-size:14px;font-weight:600;padding:8px 10px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.fer.ativo,.fer.destaque{background:#0b57d0;color:#fff;border-color:#0b57d0}
+.fer.perigo{color:#b91c1c;border-color:#fecaca}
+.fer.grande{width:100%;font-size:16px;min-height:52px}
+/* área de desenho: a altura é calculada por JS para ocupar exatamente o que sobra da tela */
+#palco{position:relative;height:60vh;min-height:200px;background:#fff;border:1px solid #cbd5e1;border-radius:12px}
+#tela{width:100%;height:100%;display:block;border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair}
+.lupa{display:none;position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid #0b57d0;box-shadow:0 6px 18px rgba(2,6,23,.35);overflow:hidden;pointer-events:none;z-index:30;background:#fff}
+.lupa canvas{width:120px;height:120px;display:block}
+.dica{font-size:13px;color:#475569;margin:10px 2px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.foto{position:relative;margin:0;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden;background:#fff}
+.foto img{width:100%;height:96px;object-fit:cover;display:block}
+.foto figcaption{font-size:12px;text-align:center;padding:3px;color:#334155}
+.xFoto{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(15,23,42,.75);color:#fff;font-size:15px;cursor:pointer}
+.form{display:flex;flex-direction:column;gap:10px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:#334155}
+.form input,.form textarea,#mvCampo{font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
+.resumo{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px}
+.titulo{font-size:17px;margin:4px 0 8px}
+.ajuda{margin:0;padding-left:18px;font-size:14px;color:#334155;display:flex;flex-direction:column;gap:6px}
+.bloco{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-top:10px}
+.bloco summary{font-weight:700;font-size:14px;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(2,6,23,.6);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.cartao{background:#fff;border-radius:14px;padding:16px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
+.cartao h3{margin:0;font-size:16px}
+.linha{display:flex;gap:8px}
+#modalValor{z-index:70}
+.modal.camera{background:#000;flex-direction:column;padding:0}
+#videoCam{width:100%;height:100%;object-fit:contain;flex:1;min-height:0}
+.camTopo{position:absolute;top:calc(10px + env(safe-area-inset-top));left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 12px;z-index:2}
+#camContagem{color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:999px;font-size:13px}
+.camBase{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));left:0;right:0;display:flex;align-items:center;justify-content:center;gap:14px;z-index:2}
+.camBtn{min-height:46px;border:none;border-radius:999px;background:rgba(255,255,255,.92);font-size:15px;font-weight:700;padding:10px 16px;cursor:pointer}
+.camBtn.shutter{width:74px;height:74px;font-size:30px;background:#fff;border:4px solid #0b57d0}
+.camDica{color:#fff;font-size:11px;opacity:.8;max-width:80px}
+.modal.camera.flash::after{content:'';position:absolute;inset:0;background:#fff;opacity:.7}
+/* editor de foto: mesmas ferramentas do croqui, desenhando sobre a foto */
+.modal.editor{background:#f1f5f9;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom))}
+.modal.editor .toolbar{margin:0}
+.modal.editor .fer{min-height:40px;padding:6px 8px;font-size:13px}
+.edTopo{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#edTitulo{font-weight:700;font-size:15px}
+#palcoF{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;background:#0f172a;border-radius:12px;overflow:hidden}
+#telaF{display:block;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair;background:#fff}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:90;max-width:92vw;text-align:center}
+#relatorio{display:none}
+@media print{
+ @page{margin:12mm}
+ body>*:not(#relatorio){display:none!important}
+ #relatorio{display:block;font-size:12px;color:#000}
+ .rCab{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:10px}
+ .rCab h1{margin:0;font-size:22px}.rCab p{margin:0;font-size:11px;color:#333}
+ .rTab{width:100%;border-collapse:collapse;margin-bottom:8px}
+ .rTab th,.rTab td{border:1px solid #999;padding:5px 7px;text-align:left;font-size:12px}
+ .rTab th{width:32%;background:#eee}
+ #relatorio h2{font-size:14px;margin:12px 0 6px;border-bottom:1px solid #ccc;padding-bottom:2px}
+ .rCroqui{width:100%;border:1px solid #999}
+ .rMed{margin:0;padding-left:18px}.rObs{white-space:pre-wrap}
+ .rFotos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .rfoto{margin:0;break-inside:avoid;border:1px solid #999;padding:4px}
+ .rfoto img{width:100%;max-height:8cm;object-fit:contain;display:block}
+ .rfoto figcaption{font-size:11px;text-align:center;padding-top:3px}
+ .rAssin{margin-top:36px;text-align:center;font-size:11px}
+ .rAssin span{display:block;border-top:1px solid #000;width:70%;margin:0 auto 4px}
+ .rPe{margin-top:14px;font-size:10px;color:#555;text-align:right}
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="marca">📐 METRIA<span class="sub">registro técnico de campo</span></div>
+  <span id="saveStatus" class="save">salvo ✓</span>
+</header>
+
+<nav class="tabs">
+  <button class="tab ativo" data-tab="croqui">✏️ Croqui</button>
+  <button class="tab" data-tab="fotos">📷 Fotos <span id="contFotos" class="badge">0</span></button>
+  <button class="tab" data-tab="dados">📋 Dados</button>
+  <button class="tab" data-tab="relatorio">📄 Relatório</button>
+  <button class="tab" data-tab="ajuda">❓ Ajuda</button>
+</nav>
+
+<main>
+  <!-- CROQUI -->
+  <section id="tab-croqui">
+    <div class="toolbar">
+      <button class="fer ativo" data-fer="medida">📏 Medida (mm)</button>
+      <button class="fer" data-fer="livre">✏️ Livre</button>
+      <button class="fer" data-fer="texto">🔤 Texto</button>
+      <button class="fer" id="btnDesfazer">↩️ Desfazer</button>
+      <button class="fer perigo" id="btnLimpar">🗑️ Limpar</button>
+    </div>
+    <div id="palco">
+      <canvas id="tela"></canvas>
+      <div class="lupa" id="lupa"><canvas id="lupaTela" width="240" height="240"></canvas></div>
+    </div>
+    <p class="dica" id="dicaCroqui">Arraste para desenhar; a <b>lupa</b> mostra o ponto. Em <b>Medida</b>, solte e digite o valor em mm.</p>
+  </section>
+
+  <!-- FOTOS -->
+  <section id="tab-fotos" hidden>
+    <div class="toolbar">
+      <button class="fer destaque" id="btnCamera">📷 Câmera (várias fotos)</button>
+      <button class="fer" id="btnGaleria">🖼️ Galeria</button>
+    </div>
+    <input type="file" id="inpGaleria" accept="image/*" multiple hidden>
+    <input type="file" id="inpCameraNativa" accept="image/*" capture="environment" hidden>
+    <div id="galeria" class="grade"></div>
+    <p class="dica" id="dicaFotos"></p>
+  </section>
+
+  <!-- DADOS -->
+  <section id="tab-dados" hidden>
+    <div class="form">
+      <label>Obra / Cliente<input id="dObra" type="text" placeholder="Ex.: Reforma galpão — Cliente X"></label>
+      <label>Local<input id="dLocal" type="text" placeholder="Endereço / ambiente"></label>
+      <label>Técnico responsável<input id="dTecnico" type="text"></label>
+      <label>Data<input id="dData" type="date"></label>
+      <label>Observações<textarea id="dObs" rows="4" placeholder="Anotações de campo..."></textarea></label>
+      <button class="fer perigo" id="btnNovo">🆕 Novo registro (apaga o atual)</button>
+    </div>
+  </section>
+
+  <!-- RELATÓRIO -->
+  <section id="tab-relatorio" hidden>
+    <p id="resumo" class="resumo"></p>
+    <button class="fer destaque grande" id="btnGerar">📄 Gerar relatório / PDF</button>
+    <p class="dica">Abre a impressão do sistema — escolha <b>Salvar como PDF</b> ou imprima. Inclui dados, croqui, medidas em mm e todas as fotos numeradas (com o que você desenhou sobre elas).</p>
+  </section>
+
+  <!-- AJUDA -->
+  <section id="tab-ajuda" hidden>
+    <h2 class="titulo">Ajuda</h2>
+    <ul class="ajuda">
+      <li>📏 <b>Medida:</b> toque e arraste; ao soltar, digite o valor em <b>mm</b>.</li>
+      <li>🔍 <b>Lupa:</b> ao tocar para desenhar, uma bola de aumento mostra o ponto do toque.</li>
+      <li>✏️ <b>Livre / Texto:</b> rabisco livre e etiquetas. <b>Desfazer</b> remove o último elemento.</li>
+      <li>📷 <b>Fotos:</b> em <b>Câmera</b> você tira várias fotos seguidas; toque em <b>Concluir</b> ao terminar. <b>Galeria</b> importa várias de uma vez.</li>
+      <li>🖊️ <b>Desenhar sobre a foto:</b> toque na foto para abrir o editor, com as mesmas ferramentas do croqui (medida em mm, livre, texto, desfazer, limpar). O desenho fica salvo na foto e vai no relatório.</li>
+      <li>🗑️ O <b>✕</b> na foto (ou <b>Excluir foto</b> no editor) exclui <b>definitivamente</b>.</li>
+      <li>📄 <b>Relatório:</b> gera a página com dados, croqui, medidas e fotos — use “Salvar como PDF”.</li>
+      <li>💾 Tudo é salvo automaticamente neste aparelho.</li>
+    </ul>
+    <details class="bloco"><summary>💾 Backup do registro</summary>
+      <div class="toolbar" style="margin-top:10px">
+        <button class="fer" id="btnExportar">⬇️ Exportar (.json)</button>
+        <button class="fer" id="btnImportar">⬆️ Importar</button>
+        <input type="file" id="inpBackup" accept="application/json,.json" hidden>
+      </div>
+      <p class="dica">Exporte para guardar ou passar o registro a outro celular.</p>
+    </details>
+  </section>
+</main>
+
+<!-- Editor de foto (desenhar sobre a foto) -->
+<div class="modal editor" id="modalEditor" hidden>
+  <div class="edTopo">
+    <span id="edTitulo">Foto</span>
+    <button class="fer destaque" id="edFechar" style="flex:0 0 auto">✔️ Concluir</button>
+  </div>
+  <div class="toolbar">
+    <button class="fer ativo" data-ferf="medida">📏 Medida (mm)</button>
+    <button class="fer" data-ferf="livre">✏️ Livre</button>
+    <button class="fer" data-ferf="texto">🔤 Texto</button>
+    <button class="fer" id="edDesfazer">↩️ Desfazer</button>
+    <button class="fer perigo" id="edLimpar">🗑️ Limpar</button>
+  </div>
+  <div id="palcoF">
+    <canvas id="telaF"></canvas>
+    <div class="lupa" id="lupaF"><canvas id="lupaTelaF" width="240" height="240"></canvas></div>
+  </div>
+  <button class="fer perigo" id="edExcluir" style="flex:0 0 auto">🗑️ Excluir foto</button>
+</div>
+
+<!-- Modal: digitar medida (mm) ou texto -->
+<div class="modal" id="modalValor" hidden>
+  <div class="cartao">
+    <h3 id="mvTitulo">Medida (mm)</h3>
+    <input id="mvCampo" type="text" inputmode="decimal" autocomplete="off">
+    <div class="linha">
+      <button class="fer" id="mvCancelar">Cancelar</button>
+      <button class="fer destaque" id="mvOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: câmera interna (várias fotos seguidas) -->
+<div class="modal camera" id="modalCamera" hidden>
+  <video id="videoCam" autoplay playsinline muted></video>
+  <div class="camTopo">
+    <span id="camContagem">0 fotos nesta sessão</span>
+    <button class="camBtn" id="btnVirar">🔄 Virar</button>
+  </div>
+  <div class="camBase">
+    <button class="camBtn" id="btnFecharCam">✔️ Concluir</button>
+    <button class="camBtn shutter" id="btnCapturar" aria-label="Tirar foto">📸</button>
+    <span class="camDica">toque quantas vezes quiser</span>
+  </div>
+</div>
+
+<div id="toast" hidden></div>
+
+<!-- Somente para impressão -->
+<section id="relatorio"></section>
+
+<script>
+'use strict';
+/* ===== METRIA — arquivo único, 100% local (sem Firebase) =====
+   Dados salvos no próprio aparelho (IndexedDB). Hospedagem: GitHub. */
+
+const $ = id => document.getElementById(id);
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtMM = m => String(m).replace('.', ',');
+let toastTimer;
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,2400); }
+
+/* ---------- estado único ---------- */
+function novoEstado(){ return { v:3, dados:{obra:'',local:'',tecnico:'',data:new Date().toISOString().slice(0,10),obs:''}, elementos:[], fotos:[] }; }
+let estado = novoEstado();
+
+/* ---------- persistência: IndexedDB (fotos grandes) c/ fallback ---------- */
+const banco = {
+  db:null, modo:'idb',
+  abrir(){ return new Promise(res=>{ try{
+      const r=indexedDB.open('metria',1);
+      r.onupgradeneeded=()=>{ r.result.createObjectStore('kv'); };
+      r.onsuccess=()=>{ banco.db=r.result; res(); };
+      r.onerror=()=>{ banco.modo='local'; res(); };
+    }catch(e){ banco.modo='local'; res(); } }); },
+  ler(){ return new Promise(res=>{
+      if(banco.modo==='local'){ try{ res(JSON.parse(localStorage.getItem('metria_estado')||'null')); }catch(e){ res(null); } return; }
+      const t=banco.db.transaction('kv','readonly').objectStore('kv').get('estado');
+      t.onsuccess=()=>res(t.result||null); t.onerror=()=>res(null); }); },
+  gravar(v){ return new Promise((res,rej)=>{
+      if(banco.modo==='local'){ try{ localStorage.setItem('metria_estado',JSON.stringify(v)); res(); }catch(e){ rej(e); } return; }
+      const t=banco.db.transaction('kv','readwrite').objectStore('kv').put(v,'estado');
+      t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
+};
+let fila=Promise.resolve(), timerSalvar;
+function salvar(){
+  $('saveStatus').textContent='salvando…';
+  fila=fila.then(()=>banco.gravar(estado))
+    .then(()=>{ $('saveStatus').textContent='salvo ✓'; })
+    .catch(()=>{ $('saveStatus').textContent='erro ao salvar'; toast('⚠️ Não foi possível salvar (espaço?). Exporte um backup.'); });
+  return fila;
+}
+function salvarDepois(){ clearTimeout(timerSalvar); timerSalvar=setTimeout(salvar,350); }
+
+/* ---------- desenho (compartilhado por croqui, editor de foto e relatório) ----------
+   Elementos guardados em coordenadas normalizadas (0–1) — servem para qualquer tamanho.
+   k = fator de escala de linhas e textos. */
+const AZUL='#0b57d0', TINTA='#111827';
+function desenhaEls(c,els,w,h,k){
+  const P=p=>({x:p.x*w,y:p.y*h});
+  const seg=(a,b)=>{ c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); };
+  c.lineCap='round'; c.lineJoin='round'; c.setLineDash([]);
+  for(const el of els){
+    if(el.tipo==='cota'){
+      const a=P(el.a), b=P(el.b);
+      c.strokeStyle=AZUL; c.lineWidth=2*k; seg(a,b);
+      const ang=Math.atan2(b.y-a.y,b.x-a.x)+Math.PI/2, t=8*k;
+      for(const p of [a,b]) seg({x:p.x-Math.cos(ang)*t,y:p.y-Math.sin(ang)*t},{x:p.x+Math.cos(ang)*t,y:p.y+Math.sin(ang)*t});
+      const txt=fmtMM(el.mm)+' mm';
+      c.font='600 '+(13*k)+'px system-ui,sans-serif';
+      const tw=c.measureText(txt).width;
+      const mx=(a.x+b.x)/2+Math.cos(ang)*16*k, my=(a.y+b.y)/2+Math.sin(ang)*16*k;
+      c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(mx-tw/2-5*k,my-11*k,tw+10*k,20*k);
+      c.fillStyle=AZUL; c.textAlign='center'; c.textBaseline='middle';
+      c.fillText(txt,mx,my); c.textAlign='start'; c.textBaseline='alphabetic';
+    } else if(el.tipo==='texto'){
+      const p=P(el.p);
+      c.font='600 '+(14*k)+'px system-ui,sans-serif';
+      const tw=c.measureText(el.txt).width;
+      c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(p.x-3*k,p.y-15*k,tw+6*k,20*k);
+      c.fillStyle=TINTA; c.fillText(el.txt,p.x,p.y);
+    } else if(el.pontos&&el.pontos.length>1){
+      c.strokeStyle=TINTA; c.lineWidth=2.5*k;
+      c.beginPath(); const p0=P(el.pontos[0]); c.moveTo(p0.x,p0.y);
+      for(let i=1;i<el.pontos.length;i++){ const p=P(el.pontos[i]); c.lineTo(p.x,p.y); }
+      c.stroke();
+    }
+  }
+}
+
+/* ---------- "prancha": um canvas com as ferramentas (usada no croqui e na foto) ---------- */
+function criarPrancha(o){
+  const cv=o.canvas, c=cv.getContext('2d'), lupa=o.lupa, lc=o.lupaCanvas.getContext('2d');
+  const P={ ferr:'medida', dpr:1, w:0, h:0, arr:null };
+  const lim=v=>Math.min(1,Math.max(0,v));
+
+  P.ajustar=function(){
+    const r=cv.getBoundingClientRect();
+    if(r.width<10||r.height<10) return;
+    P.dpr=Math.min(window.devicePixelRatio||1,3);
+    P.w=r.width; P.h=r.height;
+    cv.width=Math.round(r.width*P.dpr); cv.height=Math.round(r.height*P.dpr);
+    P.redesenhar();
+  };
+  P.redesenhar=function(previa){
+    if(!P.w) return;
+    c.setTransform(P.dpr,0,0,P.dpr,0,0);
+    o.fundo(c,P.w,P.h);
+    desenhaEls(c,o.els(),P.w,P.h,1);
+    if(previa){
+      c.save(); c.setLineDash([6,5]); c.strokeStyle=AZUL; c.lineWidth=2;
+      c.beginPath(); c.moveTo(previa.a.x*P.w,previa.a.y*P.h); c.lineTo(previa.b.x*P.w,previa.b.y*P.h); c.stroke(); c.restore();
+    }
+  };
+  P.ponto=function(e){
+    const r=cv.getBoundingClientRect();
+    return { x:lim((e.clientX-r.left)/r.width), y:lim((e.clientY-r.top)/r.height) };
+  };
+  P.lupaEm=function(e){
+    const pr=o.palco.getBoundingClientRect(), cr=cv.getBoundingClientRect();
+    const x=e.clientX-pr.left, y=e.clientY-pr.top;
+    const L=240, Z=2.5, lado=(120/Z)*P.dpr;
+    const sx=(e.clientX-cr.left)*P.dpr, sy=(e.clientY-cr.top)*P.dpr;
+    lc.setTransform(1,0,0,1,0,0);
+    lc.fillStyle='#fff'; lc.fillRect(0,0,L,L);
+    lc.drawImage(cv, sx-lado/2, sy-lado/2, lado, lado, 0,0,L,L);
+    lc.strokeStyle='#ef4444'; lc.lineWidth=2; lc.beginPath();
+    lc.moveTo(L/2-18,L/2); lc.lineTo(L/2+18,L/2);
+    lc.moveTo(L/2,L/2-18); lc.lineTo(L/2,L/2+18); lc.stroke();
+    const lx=Math.min(Math.max(x-60,4),pr.width-124);
+    let ly=y-158; if(ly<4) ly=y+34;
+    lupa.style.left=lx+'px'; lupa.style.top=ly+'px';
+  };
+
+  cv.addEventListener('contextmenu',e=>e.preventDefault());
+  cv.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+    const p=P.ponto(e);
+    P.arr={ini:p,atual:p,pontos:[p]};
+    P.lupaEm(e); lupa.style.display='block';
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(!P.arr) return;
+    e.preventDefault();
+    P.arr.atual=P.ponto(e);
+    if(P.ferr==='livre'){
+      P.arr.pontos.push(P.arr.atual);
+      P.redesenhar();
+      c.strokeStyle=TINTA; c.lineWidth=2.5; c.lineCap='round'; c.lineJoin='round';
+      c.beginPath(); c.moveTo(P.arr.pontos[0].x*P.w,P.arr.pontos[0].y*P.h);
+      for(const q of P.arr.pontos) c.lineTo(q.x*P.w,q.y*P.h);
+      c.stroke();
+    } else if(P.ferr==='medida'){
+      P.redesenhar({a:P.arr.ini,b:P.arr.atual});
+    }
+    P.lupaEm(e);
+  });
+  function fim(){
+    if(!P.arr) return;
+    lupa.style.display='none';
+    const a=P.arr.ini, b=P.arr.atual, pts=P.arr.pontos;
+    P.arr=null;
+    if(P.ferr==='medida'){
+      if(Math.hypot((b.x-a.x)*P.w,(b.y-a.y)*P.h)>10) pedirValor('medida',{a,b},P); else P.redesenhar();
+    } else if(P.ferr==='livre'){
+      if(pts.length>1){ o.els().push({id:uid(),tipo:'livre',pontos:pts}); salvarDepois(); }
+      P.redesenhar();
+    } else if(P.ferr==='texto'){
+      pedirValor('texto',{p:a},P); P.redesenhar();
+    }
+  }
+  cv.addEventListener('pointerup',fim);
+  cv.addEventListener('pointercancel',()=>{ P.arr=null; lupa.style.display='none'; P.redesenhar(); });
+  P.els=o.els;
+  return P;
+}
+
+/* ---------- croqui ---------- */
+const palco=$('palco');
+const pCroqui=criarPrancha({
+  canvas:$('tela'), palco:palco, lupa:$('lupa'), lupaCanvas:$('lupaTela'),
+  els:()=>estado.elementos,
+  fundo:(c,w,h)=>{
+    c.fillStyle='#fff'; c.fillRect(0,0,w,h);
+    c.strokeStyle='#eef2f7'; c.lineWidth=1; c.beginPath();
+    for(let x=24;x<w;x+=24){ c.moveTo(x,0); c.lineTo(x,h); }
+    for(let y=24;y<h;y+=24){ c.moveTo(0,y); c.lineTo(w,y); }
+    c.stroke();
+  }
+});
+/* área de desenho enquadrada: ocupa exatamente o que sobra da tela (sem rolar) */
+function ajustarPalco(){
+  if($('tab-croqui').hidden) return;
+  const docTop=palco.getBoundingClientRect().top+window.scrollY;
+  const d=$('dicaCroqui'), cs=getComputedStyle(d);
+  const dicaH=d.offsetHeight+parseFloat(cs.marginTop)+parseFloat(cs.marginBottom);
+  const baixo=parseFloat(getComputedStyle(document.body).paddingBottom)||0;
+  const livre=window.innerHeight-docTop-dicaH-10-baixo;
+  palco.style.height=Math.max(200,Math.floor(livre))+'px';
+}
+function ajustarCroqui(){ ajustarPalco(); pCroqui.ajustar(); }
+
+/* ---------- abas ---------- */
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('ativo',x===b));
+  document.querySelectorAll('main>section').forEach(s=>s.hidden=(s.id!=='tab-'+b.dataset.tab));
+  if(b.dataset.tab==='croqui') requestAnimationFrame(ajustarCroqui);
+  if(b.dataset.tab==='relatorio') atualizarResumo();
+}));
+
+/* ferramentas do croqui */
+document.querySelectorAll('[data-fer]').forEach(b=>b.addEventListener('click',()=>{
+  pCroqui.ferr=b.dataset.fer;
+  document.querySelectorAll('[data-fer]').forEach(x=>x.classList.toggle('ativo',x===b));
+}));
+$('btnDesfazer').addEventListener('click',()=>{
+  if(!estado.elementos.length){ toast('Nada para desfazer.'); return; }
+  estado.elementos.pop(); salvarDepois(); pCroqui.redesenhar();
+});
+$('btnLimpar').addEventListener('click',()=>{
+  if(!estado.elementos.length) return;
+  if(confirm('Limpar todo o croqui (medidas, traços e textos)?')){ estado.elementos=[]; salvar(); pCroqui.redesenhar(); }
+});
+
+/* ---------- modal medir/texto — medida SEMPRE digitada em mm ---------- */
+let pedido=null;
+function pedirValor(tipo,geom,alvo){
+  pedido={tipo,geom,alvo};
+  $('mvTitulo').textContent = tipo==='medida' ? 'Digite a medida (mm)' : 'Digite o texto';
+  const c=$('mvCampo'); c.value='';
+  c.setAttribute('inputmode', tipo==='medida' ? 'decimal' : 'text');
+  $('modalValor').hidden=false;
+  setTimeout(()=>c.focus(),60);
+}
+function fecharValor(){ pedido=null; $('modalValor').hidden=true; }
+function confirmarValor(){
+  if(!pedido) return;
+  const v=$('mvCampo').value.trim();
+  if(!v){ toast('Digite um valor.'); return; }
+  const alvo=pedido.alvo;
+  if(pedido.tipo==='medida'){
+    const n=v.replace(',','.');
+    if(!/^\d+(\.\d+)?$/.test(n)||parseFloat(n)<=0){ toast('Medida inválida — use apenas números (mm).'); return; }
+    alvo.els().push({id:uid(),tipo:'cota',a:pedido.geom.a,b:pedido.geom.b,mm:n});
+  } else {
+    alvo.els().push({id:uid(),tipo:'texto',p:pedido.geom.p,txt:v});
+  }
+  fecharValor(); salvarDepois(); alvo.redesenhar();
+}
+$('mvOk').addEventListener('click',confirmarValor);
+$('mvCancelar').addEventListener('click',()=>{ const a=pedido&&pedido.alvo; fecharValor(); if(a) a.redesenhar(); });
+$('mvCampo').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); confirmarValor(); } });
+$('modalValor').addEventListener('click',e=>{ if(e.target===$('modalValor')){ const a=pedido&&pedido.alvo; fecharValor(); if(a) a.redesenhar(); } });
+
+/* ---------- fotos: fonte da verdade = estado.fotos ---------- */
+function addFoto(data){
+  estado.fotos.push({id:uid(),data,em:Date.now(),elementos:[]});
+  salvar(); renderFotos();
+}
+function excluirFoto(id){
+  const i=estado.fotos.findIndex(f=>f.id===id);
+  if(i<0) return;
+  estado.fotos.splice(i,1);
+  salvar();
+  renderFotos();
+  toast('Foto excluída definitivamente.');
+}
+function renderFotos(){
+  const g=$('galeria'); g.innerHTML='';
+  estado.fotos.forEach((f,i)=>{
+    const fig=document.createElement('figure'); fig.className='foto';
+    const img=document.createElement('img'); img.src=f.data; img.alt='Foto '+(i+1); img.loading='lazy';
+    img.addEventListener('click',()=>abrirEditor(f.id));
+    const cap=document.createElement('figcaption'); cap.textContent='Foto '+(i+1)+((f.elementos&&f.elementos.length)?' ✏️':'');
+    const bx=document.createElement('button'); bx.className='xFoto'; bx.textContent='✕'; bx.setAttribute('aria-label','Excluir foto');
+    bx.addEventListener('click',ev=>{ ev.stopPropagation(); if(confirm('Excluir a Foto '+(i+1)+'? Não dá para desfazer.')) excluirFoto(f.id); });
+    fig.append(img,cap,bx); g.appendChild(fig);
+  });
+  $('contFotos').textContent=estado.fotos.length;
+  $('dicaFotos').innerHTML = estado.fotos.length
+    ? 'Toque numa foto para <b>desenhar sobre ela</b> (medidas, traços, texto). O <b>✕</b> exclui de vez — a foto não volta.'
+    : 'Nenhuma foto ainda. Em <b>Câmera</b> você tira várias fotos seguidas sem sair da câmera.';
+  atualizarResumo();
+}
+function canvasComprimido(orig,w,h,max=1600,q=.75){
+  let W=w,H=h;
+  if(Math.max(W,H)>max){ const k=max/Math.max(W,H); W=Math.round(W*k); H=Math.round(H*k); }
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  c.getContext('2d').drawImage(orig,0,0,W,H);
+  return c.toDataURL('image/jpeg',q);
+}
+function importarArquivos(lista){
+  const files=[...lista]; if(!files.length) return;
+  let ok=0,falhas=0,rest=files.length;
+  const fim=()=>{ if(--rest===0) toast(ok+' foto(s) adicionada(s)'+(falhas?' — '+falhas+' falharam':'')); };
+  files.forEach(f=>{
+    const u=URL.createObjectURL(f); const im=new Image();
+    im.onload=()=>{ try{ addFoto(canvasComprimido(im,im.naturalWidth,im.naturalHeight)); ok++; }catch(e){ falhas++; } URL.revokeObjectURL(u); fim(); };
+    im.onerror=()=>{ falhas++; URL.revokeObjectURL(u); fim(); };
+    im.src=u;
+  });
+}
+$('btnGaleria').addEventListener('click',()=>$('inpGaleria').click());
+$('inpGaleria').addEventListener('change',e=>{ importarArquivos(e.target.files); e.target.value=''; });
+$('inpCameraNativa').addEventListener('change',e=>{ importarArquivos(e.target.files); e.target.value=''; });
+
+/* ---------- editor de foto: mesmas ferramentas do croqui, sobre a foto ---------- */
+let edId=null, edImg=null;
+const fotoAtual=()=>estado.fotos.find(f=>f.id===edId);
+const pFoto=criarPrancha({
+  canvas:$('telaF'), palco:$('palcoF'), lupa:$('lupaF'), lupaCanvas:$('lupaTelaF'),
+  els:()=>{ const f=fotoAtual(); if(!f) return []; if(!f.elementos) f.elementos=[]; return f.elementos; },
+  fundo:(c,w,h)=>{ c.fillStyle='#fff'; c.fillRect(0,0,w,h); if(edImg) c.drawImage(edImg,0,0,w,h); }
+});
+function ajustarEditor(){
+  if($('modalEditor').hidden||!edImg) return;
+  const r=$('palcoF').getBoundingClientRect();
+  if(r.width<10||r.height<10) return;
+  const ar=edImg.naturalWidth/edImg.naturalHeight;
+  let w=r.width, h=w/ar;
+  if(h>r.height){ h=r.height; w=h*ar; }
+  const t=$('telaF'); t.style.width=Math.floor(w)+'px'; t.style.height=Math.floor(h)+'px';
+  pFoto.ajustar();
+}
+function abrirEditor(id){
+  const f=estado.fotos.find(x=>x.id===id); if(!f) return;
+  const im=new Image();
+  im.onload=()=>{
+    edId=id; edImg=im;
+    if(!f.elementos) f.elementos=[];
+    $('edTitulo').textContent='Foto '+(estado.fotos.indexOf(f)+1);
+    $('modalEditor').hidden=false;
+    requestAnimationFrame(()=>requestAnimationFrame(ajustarEditor));
+  };
+  im.onerror=()=>toast('Não foi possível abrir a foto.');
+  im.src=f.data;
+}
+function fecharEditor(){
+  $('modalEditor').hidden=true; edId=null; edImg=null;
+  salvar(); renderFotos();
+}
+document.querySelectorAll('[data-ferf]').forEach(b=>b.addEventListener('click',()=>{
+  pFoto.ferr=b.dataset.ferf;
+  document.querySelectorAll('[data-ferf]').forEach(x=>x.classList.toggle('ativo',x===b));
+}));
+$('edDesfazer').addEventListener('click',()=>{
+  const els=pFoto.els();
+  if(!els.length){ toast('Nada para desfazer.'); return; }
+  els.pop(); salvarDepois(); pFoto.redesenhar();
+});
+$('edLimpar').addEventListener('click',()=>{
+  const f=fotoAtual(); if(!f||!f.elementos||!f.elementos.length) return;
+  if(confirm('Apagar todo o desenho desta foto? (a foto em si continua)')){ f.elementos=[]; salvar(); pFoto.redesenhar(); }
+});
+$('edExcluir').addEventListener('click',()=>{
+  if(edId&&confirm('Excluir esta foto? Não dá para desfazer.')){ const id=edId; $('modalEditor').hidden=true; edId=null; edImg=null; excluirFoto(id); }
+});
+$('edFechar').addEventListener('click',fecharEditor);
+
+/* ---------- câmera interna: várias fotos sem fechar ---------- */
+let fluxo=null, ladoCam='environment', sessao=0, ultimaCaptura=0;
+function pararCamera(){
+  if(fluxo){ fluxo.getTracks().forEach(t=>t.stop()); fluxo=null; }
+  const v=$('videoCam'); if(v) v.srcObject=null;
+}
+async function ligarCamera(){
+  pararCamera();
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    $('modalCamera').hidden=true;
+    toast('Câmera do sistema — uma foto por vez. Toque em Câmera de novo para a próxima.');
+    $('inpCameraNativa').click(); return;
+  }
+  try{
+    fluxo=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:ladoCam},width:{ideal:1920},height:{ideal:1080}}});
+    const v=$('videoCam'); v.srcObject=fluxo; await v.play().catch(()=>{});
+  }catch(e){
+    $('modalCamera').hidden=true;
+    toast('Sem acesso à câmera interna — usando a câmera do sistema.');
+    $('inpCameraNativa').click();
+  }
+}
+$('btnCamera').addEventListener('click',async()=>{
+  sessao=0; $('camContagem').textContent='0 fotos nesta sessão';
+  $('modalCamera').hidden=false; await ligarCamera();
+});
+$('btnFecharCam').addEventListener('click',()=>{
+  pararCamera(); $('modalCamera').hidden=true;
+  if(sessao) toast(sessao+' foto(s) adicionada(s).');
+});
+$('btnVirar').addEventListener('click',async()=>{ ladoCam=ladoCam==='environment'?'user':'environment'; await ligarCamera(); });
+$('btnCapturar').addEventListener('click',()=>{
+  if(Date.now()-ultimaCaptura<350) return;
+  ultimaCaptura=Date.now();
+  const v=$('videoCam');
+  if(!v.videoWidth){ toast('Câmera ainda iniciando…'); return; }
+  const c=document.createElement('canvas'); c.width=v.videoWidth; c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0);
+  addFoto(canvasComprimido(c,c.width,c.height));
+  sessao++;
+  $('camContagem').textContent=sessao+(sessao===1?' foto nesta sessão':' fotos nesta sessão');
+  const m=$('modalCamera'); m.classList.add('flash'); setTimeout(()=>m.classList.remove('flash'),150);
+  if(navigator.vibrate) navigator.vibrate(30);
+});
+
+/* ---------- dados ---------- */
+const campos={dObra:'obra',dLocal:'local',dTecnico:'tecnico',dData:'data',dObs:'obs'};
+for(const [id,k] of Object.entries(campos)){
+  $(id).addEventListener('input',e=>{ estado.dados[k]=e.target.value; salvarDepois(); });
+}
+function pintaDados(){ for(const [id,k] of Object.entries(campos)) $(id).value=estado.dados[k]||''; }
+$('btnNovo').addEventListener('click',()=>{
+  if(confirm('Começar um novo registro? O atual (croqui, fotos e dados) será apagado deste aparelho. Exporte um backup antes, se precisar.')){
+    estado=novoEstado(); pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Novo registro criado.');
+  }
+});
+
+/* ---------- relatório ---------- */
+function atualizarResumo(){
+  const m=estado.elementos.filter(e=>e.tipo==='cota').length;
+  const mf=estado.fotos.reduce((s,f)=>s+((f.elementos||[]).filter(e=>e.tipo==='cota').length),0);
+  $('resumo').textContent='Este registro: '+m+' medida(s) no croqui'+(mf?' + '+mf+' nas fotos':'')+' (mm) · '+estado.fotos.length+' foto(s) · croqui com '+estado.elementos.length+' elemento(s).';
+}
+function carregarImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+async function fotoParaRelatorio(f){
+  if(!f.elementos||!f.elementos.length) return f.data;
+  try{
+    const im=await carregarImg(f.data);
+    const W=Math.min(im.naturalWidth,1600), H=Math.round(W*im.naturalHeight/im.naturalWidth);
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    const c=cv.getContext('2d'); c.drawImage(im,0,0,W,H);
+    desenhaEls(c,f.elementos,W,H,W/420);
+    return cv.toDataURL('image/jpeg',.85);
+  }catch(e){ return f.data; }
+}
+async function gerarRelatorio(){
+  pCroqui.redesenhar();
+  const d=estado.dados;
+  const cotas=estado.elementos.filter(e=>e.tipo==='cota');
+  const img=$('tela').toDataURL('image/png');
+  const linhas=cotas.map((c,i)=>'<li><b>M'+(i+1)+'</b> — '+esc(fmtMM(c.mm))+' mm</li>').join('')||'<li>Nenhuma medida lançada.</li>';
+  const srcs=await Promise.all(estado.fotos.map(fotoParaRelatorio));
+  const fotos=estado.fotos.map((f,i)=>{
+    const med=(f.elementos||[]).filter(e=>e.tipo==='cota').map(c=>fmtMM(c.mm)+' mm');
+    return '<figure class="rfoto"><img src="'+srcs[i]+'"><figcaption>Foto '+(i+1)+(med.length?' — '+esc(med.join(' · ')):'')+'</figcaption></figure>';
+  }).join('');
+  $('relatorio').innerHTML =
+    '<header class="rCab"><div><h1>METRIA</h1><p>Registro técnico de campo</p></div><div>'+esc(d.data||'')+'</div></header>'+
+    '<table class="rTab"><tr><th>Obra / Cliente</th><td>'+esc(d.obra||'—')+'</td></tr><tr><th>Local</th><td>'+esc(d.local||'—')+'</td></tr><tr><th>Técnico</th><td>'+esc(d.tecnico||'—')+'</td></tr></table>'+
+    (estado.elementos.length?'<h2>Croqui</h2><img class="rCroqui" src="'+img+'">':'')+
+    (cotas.length?'<h2>Medidas (mm)</h2><ul class="rMed">'+linhas+'</ul>':'')+
+    (d.obs?'<h2>Observações</h2><p class="rObs">'+esc(d.obs)+'</p>':'')+
+    (fotos?'<h2>Fotos ('+estado.fotos.length+')</h2><div class="rFotos">'+fotos+'</div>':'')+
+    '<div class="rAssin"><span></span>Técnico responsável</div>'+
+    '<footer class="rPe">Gerado pelo METRIA em '+new Date().toLocaleString('pt-BR')+'</footer>';
+  document.title='METRIA - '+(d.obra||'registro')+(d.data?' - '+d.data:'');
+  setTimeout(()=>window.print(),80);
+}
+$('btnGerar').addEventListener('click',gerarRelatorio);
+window.addEventListener('afterprint',()=>{ document.title='METRIA — Registro Técnico de Campo'; });
+
+/* ---------- backup ---------- */
+$('btnExportar').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(estado)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='metria-'+(estado.dados.data||'registro')+'.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+});
+$('btnImportar').addEventListener('click',()=>$('inpBackup').click());
+$('inpBackup').addEventListener('change',e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{
+      const o=JSON.parse(r.result);
+      if(!o||!o.dados||!Array.isArray(o.fotos)||!Array.isArray(o.elementos)) throw new Error('formato');
+      if(!confirm('Importar este registro e substituir o atual?')) return;
+      estado=o; pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Backup importado.');
+    }catch(err){ toast('Arquivo de backup inválido.'); } };
+  r.readAsText(f);
+});
+
+/* ---------- início ---------- */
+async function iniciar(){
+  await banco.abrir();
+  const salvo=await banco.ler();
+  if(salvo&&salvo.dados){
+    estado=Object.assign(novoEstado(),salvo);
+    estado.dados=Object.assign(novoEstado().dados,salvo.dados);
+  }
+  pintaDados(); renderFotos(); ajustarCroqui();
+}
+function aoRedimensionar(){ requestAnimationFrame(()=>{ ajustarCroqui(); ajustarEditor(); }); }
+window.addEventListener('resize',aoRedimensionar);
+window.addEventListener('orientationchange',()=>setTimeout(aoRedimensionar,250));
+if(window.visualViewport) window.visualViewport.addEventListener('resize',aoRedimensionar);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') salvar(); });
+window.addEventListener('pagehide',()=>{ pararCamera(); salvar(); });
+iniciar();
+</script>
+</body>
+</html>
