@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>METRIA — Registro Técnico de Campo Por Adauri Alves</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title> Registro Técnico de Campo Por Adauri Alves</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;max-width:100%;overflow-x:hidden}
@@ -38,7 +40,7 @@ main{max-width:none;margin:0;padding:8px}
 .xFoto{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(15,23,42,.75);color:#fff;font-size:15px;cursor:pointer}
 .form{display:flex;flex-direction:column;gap:10px}
 .form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:#334155}
-.form input,.form textarea,#mvCampo{font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
+.form input,.form textarea,#mvCampo,#mvNome{font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
 .resumo{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px}
 .titulo{font-size:17px;margin:4px 0 8px}
 .ajuda{margin:0;padding-left:18px;font-size:14px;color:#334155;display:flex;flex-direction:column;gap:6px}
@@ -49,6 +51,18 @@ main{max-width:none;margin:0;padding:8px}
 .cartao h3{margin:0;font-size:16px}
 .linha{display:flex;gap:8px}
 #modalValor{z-index:70}
+/* modal de ferramentas (folha inferior) */
+.modal.sheet{z-index:65;align-items:flex-end;padding:0}
+.ferCard{max-width:520px;border-radius:18px 18px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.gFer{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.gFer .fer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:66px;font-size:12px;padding:4px}
+.gFer .fer span{font-size:24px;line-height:1}
+.rot{font-size:12px;font-weight:700;color:#475569;margin-bottom:-4px}
+.cores,.esps{display:flex;gap:8px}
+.cor{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #cbd5e1;cursor:pointer;padding:0}
+.cor.ativo{box-shadow:0 0 0 3px #0b57d0}
+.esps .fer{display:flex;align-items:center;justify-content:center;min-height:44px}
+.esps .fer i{display:block;width:70%;background:#111827;border-radius:99px}
 .modal.camera{background:#000;flex-direction:column;padding:0}
 #videoCam{width:100%;height:100%;object-fit:contain;flex:1;min-height:0}
 .camTopo{position:absolute;top:calc(10px + env(safe-area-inset-top));left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 12px;z-index:2}
@@ -58,7 +72,7 @@ main{max-width:none;margin:0;padding:8px}
 .camBtn.shutter{width:74px;height:74px;font-size:30px;background:#fff;border:4px solid #0b57d0}
 .camDica{color:#fff;font-size:11px;opacity:.8;max-width:80px}
 .modal.camera.flash::after{content:'';position:absolute;inset:0;background:#fff;opacity:.7}
-/* editor de foto: mesmas ferramentas do croqui, desenhando sobre a foto */
+/* editor de foto */
 .modal.editor{background:#f1f5f9;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom))}
 .modal.editor .toolbar{margin:0}
 .modal.editor .fer{min-height:40px;padding:6px 8px;font-size:13px}
@@ -109,17 +123,16 @@ main{max-width:none;margin:0;padding:8px}
   <!-- CROQUI -->
   <section id="tab-croqui">
     <div class="toolbar">
-      <button class="fer ativo" data-fer="medida">📏 Medida (mm)</button>
-      <button class="fer" data-fer="livre">✏️ Livre</button>
-      <button class="fer" data-fer="texto">🔤 Texto</button>
-      <button class="fer" id="btnDesfazer">↩️ Desfazer</button>
-      <button class="fer perigo" id="btnLimpar">🗑️ Limpar</button>
+      <button class="fer destaque" id="btnFerr" style="flex:2 1 150px">🛠️ Ferramentas</button>
+      <button class="fer" id="btnDesfazer" aria-label="Desfazer">↩️</button>
+      <button class="fer" id="btnRefazer" aria-label="Refazer">↪️</button>
+      <button class="fer perigo" id="btnLimpar" aria-label="Limpar">🗑️</button>
     </div>
     <div id="palco">
       <canvas id="tela"></canvas>
       <div class="lupa" id="lupa"><canvas id="lupaTela" width="240" height="240"></canvas></div>
     </div>
-    <p class="dica" id="dicaCroqui">Arraste para desenhar; a <b>lupa</b> mostra o ponto. Em <b>Medida</b>, solte e digite o valor em mm.</p>
+    <p class="dica" id="dicaCroqui">Toque em <b>🛠️ Ferramentas</b> para trocar de ferramenta, cor e espessura. Arraste para desenhar.</p>
   </section>
 
   <!-- FOTOS -->
@@ -157,11 +170,16 @@ main{max-width:none;margin:0;padding:8px}
   <section id="tab-ajuda" hidden>
     <h2 class="titulo">Ajuda</h2>
     <ul class="ajuda">
-      <li>📏 <b>Medida:</b> toque e arraste; ao soltar, digite o valor em <b>mm</b>.</li>
+      <li>🛠️ <b>Ferramentas:</b> toque no botão para abrir o menu — Medida (mm), Linha reta, Retângulo, Livre, Texto e Borracha, além de cor e espessura.</li>
+      <li>📏 <b>Medida:</b> toque e arraste; ao soltar, digite o valor em <b>mm</b> e, se quiser, um <b>nome</b> (ex.: largura da porta).</li>
+      <li>✋ <b>Mover / editar:</b> arraste um item para movê-lo; toque numa medida ou texto para corrigir o valor.</li>
+      <li>🔍 <b>Zoom:</b> use dois dedos para aproximar e arrastar o desenho. Em Ferramentas, <b>Zoom 1×</b> volta ao normal.</li>
+      <li>📐 <b>Travar 0°/90°:</b> em Ferramentas, deixa medidas e linhas só na horizontal ou vertical (desligado por padrão).</li>
+      <li>🧽 <b>Borracha:</b> toque sobre um traço, medida ou texto para apagá-lo (dá para desfazer).</li>
+      <li>↩️ ↪️ <b>Desfazer / Refazer</b> funcionam para qualquer ação, inclusive apagar.</li>
       <li>🔍 <b>Lupa:</b> ao tocar para desenhar, uma bola de aumento mostra o ponto do toque.</li>
-      <li>✏️ <b>Livre / Texto:</b> rabisco livre e etiquetas. <b>Desfazer</b> remove o último elemento.</li>
       <li>📷 <b>Fotos:</b> em <b>Câmera</b> você tira várias fotos seguidas; toque em <b>Concluir</b> ao terminar. <b>Galeria</b> importa várias de uma vez.</li>
-      <li>🖊️ <b>Desenhar sobre a foto:</b> toque na foto para abrir o editor, com as mesmas ferramentas do croqui (medida em mm, livre, texto, desfazer, limpar). O desenho fica salvo na foto e vai no relatório.</li>
+      <li>🖊️ <b>Desenhar sobre a foto:</b> toque na foto para abrir o editor, com o mesmo menu de ferramentas do croqui. O desenho fica salvo na foto e vai no relatório.</li>
       <li>🗑️ O <b>✕</b> na foto (ou <b>Excluir foto</b> no editor) exclui <b>definitivamente</b>.</li>
       <li>📄 <b>Relatório:</b> gera a página com dados, croqui, medidas e fotos — use “Salvar como PDF”.</li>
       <li>💾 Tudo é salvo automaticamente neste aparelho.</li>
@@ -184,11 +202,10 @@ main{max-width:none;margin:0;padding:8px}
     <button class="fer destaque" id="edFechar" style="flex:0 0 auto">✔️ Concluir</button>
   </div>
   <div class="toolbar">
-    <button class="fer ativo" data-ferf="medida">📏 Medida (mm)</button>
-    <button class="fer" data-ferf="livre">✏️ Livre</button>
-    <button class="fer" data-ferf="texto">🔤 Texto</button>
-    <button class="fer" id="edDesfazer">↩️ Desfazer</button>
-    <button class="fer perigo" id="edLimpar">🗑️ Limpar</button>
+    <button class="fer destaque" id="edFerr" style="flex:2 1 150px">🛠️ Ferramentas</button>
+    <button class="fer" id="edDesfazer" aria-label="Desfazer">↩️</button>
+    <button class="fer" id="edRefazer" aria-label="Refazer">↪️</button>
+    <button class="fer perigo" id="edLimpar" aria-label="Limpar">🗑️</button>
   </div>
   <div id="palcoF">
     <canvas id="telaF"></canvas>
@@ -197,11 +214,29 @@ main{max-width:none;margin:0;padding:8px}
   <button class="fer perigo" id="edExcluir" style="flex:0 0 auto">🗑️ Excluir foto</button>
 </div>
 
+<!-- Modal: ferramentas de desenho (serve ao croqui e ao editor de foto) -->
+<div class="modal sheet" id="modalFerr" hidden>
+  <div class="cartao ferCard">
+    <h3>🛠️ Ferramentas</h3>
+    <div class="gFer" id="gFer"></div>
+    <div class="rot">Cor</div>
+    <div class="cores" id="gCores"></div>
+    <div class="rot">Espessura</div>
+    <div class="esps" id="gEsps"></div>
+    <div class="linha">
+      <button class="fer" id="btnOrto">📐 Travar 0°/90°</button>
+      <button class="fer" id="btnZoom1">🔍 Zoom 1×</button>
+    </div>
+    <button class="fer destaque" id="ferOk">Pronto</button>
+  </div>
+</div>
+
 <!-- Modal: digitar medida (mm) ou texto -->
 <div class="modal" id="modalValor" hidden>
   <div class="cartao">
     <h3 id="mvTitulo">Medida (mm)</h3>
     <input id="mvCampo" type="text" inputmode="decimal" autocomplete="off">
+    <input id="mvNome" type="text" autocomplete="off" placeholder="Nome (opcional) — ex.: largura da porta">
     <div class="linha">
       <button class="fer" id="mvCancelar">Cancelar</button>
       <button class="fer destaque" id="mvOk">OK</button>
@@ -241,26 +276,44 @@ let toastTimer;
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,2400); }
 
 /* ---------- estado único ---------- */
-function novoEstado(){ return { v:3, dados:{obra:'',local:'',tecnico:'',data:new Date().toISOString().slice(0,10),obs:''}, elementos:[], fotos:[] }; }
+function novoEstado(){ return { v:4, dados:{obra:'',local:'',tecnico:'',data:new Date().toISOString().slice(0,10),obs:''}, elementos:[], fotos:[] }; }
 let estado = novoEstado();
 
 /* ---------- persistência: IndexedDB (fotos grandes) c/ fallback ---------- */
 const banco = {
-  db:null, modo:'idb',
+  db:null, modo:'idb', novas:new Set(), apagadas:new Set(), reset:false,
   abrir(){ return new Promise(res=>{ try{
       const r=indexedDB.open('metria',1);
       r.onupgradeneeded=()=>{ r.result.createObjectStore('kv'); };
       r.onsuccess=()=>{ banco.db=r.result; res(); };
       r.onerror=()=>{ banco.modo='local'; res(); };
     }catch(e){ banco.modo='local'; res(); } }); },
+  /* v4: 'estado' guarda só dados/desenhos; cada foto fica em 'foto:<id>' (gravada uma única vez) */
   ler(){ return new Promise(res=>{
       if(banco.modo==='local'){ try{ res(JSON.parse(localStorage.getItem('metria_estado')||'null')); }catch(e){ res(null); } return; }
-      const t=banco.db.transaction('kv','readonly').objectStore('kv').get('estado');
-      t.onsuccess=()=>res(t.result||null); t.onerror=()=>res(null); }); },
+      const s=banco.db.transaction('kv','readonly').objectStore('kv');
+      const t=s.get('estado');
+      t.onerror=()=>res(null);
+      t.onsuccess=()=>{
+        const e=t.result;
+        if(!e||!Array.isArray(e.fotos)){ res(e||null); return; }
+        const pend=e.fotos.filter(f=>!f.data);
+        if(!pend.length){ res(e); return; }
+        let rest=pend.length;
+        const ok=()=>{ if(--rest===0){ e.fotos=e.fotos.filter(x=>x.data); res(e); } };
+        pend.forEach(f=>{ const g=s.get('foto:'+f.id); g.onsuccess=()=>{ f.data=g.result||null; ok(); }; g.onerror=ok; });
+      }; }); },
   gravar(v){ return new Promise((res,rej)=>{
       if(banco.modo==='local'){ try{ localStorage.setItem('metria_estado',JSON.stringify(v)); res(); }catch(e){ rej(e); } return; }
-      const t=banco.db.transaction('kv','readwrite').objectStore('kv').put(v,'estado');
-      t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
+      const reset=banco.reset, N=[...banco.novas], A=[...banco.apagadas];
+      const meta=Object.assign({},v,{v:4,fotos:v.fotos.map(f=>({id:f.id,em:f.em,elementos:f.elementos||[]}))});
+      const tx=banco.db.transaction('kv','readwrite'), st=tx.objectStore('kv');
+      if(reset) st.clear();
+      st.put(meta,'estado');
+      (reset?v.fotos.map(f=>f.id):N).forEach(id=>{ const f=v.fotos.find(x=>x.id===id); if(f) st.put(f.data,'foto:'+id); });
+      A.forEach(id=>st.delete('foto:'+id));
+      tx.oncomplete=()=>{ N.forEach(i=>banco.novas.delete(i)); A.forEach(i=>banco.apagadas.delete(i)); if(reset) banco.reset=false; res(); };
+      tx.onerror=tx.onabort=()=>rej(tx.error); }); }
 };
 let fila=Promise.resolve(), timerSalvar;
 function salvar(){
@@ -273,8 +326,7 @@ function salvar(){
 function salvarDepois(){ clearTimeout(timerSalvar); timerSalvar=setTimeout(salvar,350); }
 
 /* ---------- desenho (compartilhado por croqui, editor de foto e relatório) ----------
-   Elementos guardados em coordenadas normalizadas (0–1) — servem para qualquer tamanho.
-   k = fator de escala de linhas e textos. */
+   Elementos em coordenadas normalizadas (0–1). k = fator de escala de linhas e textos. */
 const AZUL='#0b57d0', TINTA='#111827';
 function desenhaEls(c,els,w,h,k){
   const P=p=>({x:p.x*w,y:p.y*h});
@@ -286,7 +338,7 @@ function desenhaEls(c,els,w,h,k){
       c.strokeStyle=AZUL; c.lineWidth=2*k; seg(a,b);
       const ang=Math.atan2(b.y-a.y,b.x-a.x)+Math.PI/2, t=8*k;
       for(const p of [a,b]) seg({x:p.x-Math.cos(ang)*t,y:p.y-Math.sin(ang)*t},{x:p.x+Math.cos(ang)*t,y:p.y+Math.sin(ang)*t});
-      const txt=fmtMM(el.mm)+' mm';
+      const txt=(el.nome?el.nome+' · ':'')+fmtMM(el.mm)+' mm';
       c.font='600 '+(13*k)+'px system-ui,sans-serif';
       const tw=c.measureText(txt).width;
       const mx=(a.x+b.x)/2+Math.cos(ang)*16*k, my=(a.y+b.y)/2+Math.sin(ang)*16*k;
@@ -298,9 +350,15 @@ function desenhaEls(c,els,w,h,k){
       c.font='600 '+(14*k)+'px system-ui,sans-serif';
       const tw=c.measureText(el.txt).width;
       c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(p.x-3*k,p.y-15*k,tw+6*k,20*k);
-      c.fillStyle=TINTA; c.fillText(el.txt,p.x,p.y);
+      c.fillStyle=el.cor||TINTA; c.fillText(el.txt,p.x,p.y);
+    } else if(el.tipo==='linha'){
+      c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k; seg(P(el.a),P(el.b));
+    } else if(el.tipo==='ret'){
+      const a=P(el.a), b=P(el.b);
+      c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
+      c.strokeRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y));
     } else if(el.pontos&&el.pontos.length>1){
-      c.strokeStyle=TINTA; c.lineWidth=2.5*k;
+      c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
       c.beginPath(); const p0=P(el.pontos[0]); c.moveTo(p0.x,p0.y);
       for(let i=1;i<el.pontos.length;i++){ const p=P(el.pontos[i]); c.lineTo(p.x,p.y); }
       c.stroke();
@@ -308,33 +366,100 @@ function desenhaEls(c,els,w,h,k){
   }
 }
 
+/* distância (px) de um ponto a um elemento — usada pela borracha */
+function distSeg(p,a,b,w,h){
+  const px=p.x*w,py=p.y*h,ax=a.x*w,ay=a.y*h,dx=b.x*w-ax,dy=b.y*h-ay,l=dx*dx+dy*dy;
+  let t=l?((px-ax)*dx+(py-ay)*dy)/l:0; t=Math.max(0,Math.min(1,t));
+  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+}
+function distEl(el,p,w,h){
+  if(el.tipo==='cota'||el.tipo==='linha') return distSeg(p,el.a,el.b,w,h);
+  if(el.tipo==='ret'){ const A=el.a,B=el.b,c1={x:B.x,y:A.y},c2={x:A.x,y:B.y};
+    return Math.min(distSeg(p,A,c1,w,h),distSeg(p,c1,B,w,h),distSeg(p,B,c2,w,h),distSeg(p,c2,A,w,h)); }
+  if(el.tipo==='texto'){ const L=(el.txt||'').length*8/w, y=el.p.y-5/h; return distSeg(p,{x:el.p.x,y},{x:el.p.x+L,y},w,h); }
+  if(el.pontos){ let m=1e9; for(let i=1;i<el.pontos.length;i++) m=Math.min(m,distSeg(p,el.pontos[i-1],el.pontos[i],w,h)); return m; }
+  return 1e9;
+}
+
+/* ---------- catálogo de ferramentas ---------- */
+const FERR={medida:['📏','Medida (mm)'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],livre:['✏️','Livre'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha']};
+const CORES=['#111827','#0b57d0','#dc2626','#16a34a','#f59e0b','#7c3aed'];
+const ESPS=[1.5,2.5,4,6];
+function rotuloFerr(P){ const f=FERR[P.ferr]; P.btn.textContent='🛠️ '+f[0]+' '+f[1]; }
+
 /* ---------- "prancha": um canvas com as ferramentas (usada no croqui e na foto) ---------- */
+function aplicarMov(el,b,dx,dy){
+  const mv=q=>({x:q.x+dx,y:q.y+dy});
+  if(b.a) el.a=mv(b.a); if(b.b) el.b=mv(b.b); if(b.p) el.p=mv(b.p);
+  if(b.pontos) el.pontos=b.pontos.map(mv);
+}
 function criarPrancha(o){
   const cv=o.canvas, c=cv.getContext('2d'), lupa=o.lupa, lc=o.lupaCanvas.getContext('2d');
-  const P={ ferr:'medida', dpr:1, w:0, h:0, arr:null };
+  const P={ ferr:'medida', cor:TINTA, esp:2.5, orto:false, z:1, ox:0, oy:0, hist:[], refaz:[], btn:null, dpr:1, w:0, h:0, arr:null, sel:null };
+  const ptrs=new Map(); let gest=null;
   const lim=v=>Math.min(1,Math.max(0,v));
+  const clone=x=>JSON.parse(JSON.stringify(x));
+
+  /* histórico: add / del / mod (mover ou editar) */
+  P.zerar=()=>{ P.hist=[]; P.refaz=[]; };
+  P.add=el=>{ o.els().push(el); P.hist.push({op:'add',el}); P.refaz=[]; salvarDepois(); };
+  P.mod=(el,antes)=>{ P.hist.push({op:'mod',id:el.id,antes,depois:clone(el)}); P.refaz=[]; salvarDepois(); };
+  P.trocar=(id,novo)=>{ const els=o.els(), i=els.findIndex(e=>e.id===id); if(i>=0) els[i]=clone(novo); };
+  P.apagar=p=>{
+    const els=o.els(); let best=-1, bd=24/P.z;
+    els.forEach((el,i)=>{ const d=distEl(el,p,P.w,P.h); if(d<bd){ bd=d; best=i; } });
+    if(best<0){ toast('Nada por perto — toque sobre um traço.'); return; }
+    const el=els.splice(best,1)[0]; P.hist.push({op:'del',el,i:best}); P.refaz=[]; salvarDepois();
+  };
+  P.desfazer=()=>{
+    const els=o.els(); let op=P.hist.pop();
+    if(!op){ if(!els.length) return false; op={op:'add',el:els[els.length-1]}; }
+    if(op.op==='add'){ const i=els.findIndex(e=>e.id===op.el.id); if(i>=0) els.splice(i,1); }
+    else if(op.op==='del') els.splice(Math.min(op.i,els.length),0,op.el);
+    else if(op.op==='mod') P.trocar(op.id,op.antes);
+    P.refaz.push(op); salvarDepois(); P.redesenhar(); return true;
+  };
+  P.refazer=()=>{
+    const els=o.els(), op=P.refaz.pop(); if(!op) return false;
+    if(op.op==='add') els.push(op.el);
+    else if(op.op==='del'){ const i=els.findIndex(e=>e.id===op.el.id); if(i>=0) els.splice(i,1); }
+    else if(op.op==='mod') P.trocar(op.id,op.depois);
+    P.hist.push(op); salvarDepois(); P.redesenhar(); return true;
+  };
+
+  /* zoom / pan */
+  P.limitar=()=>{
+    P.z=Math.min(8,Math.max(1,P.z));
+    P.ox=Math.min(0,Math.max(P.w*(1-P.z),P.ox));
+    P.oy=Math.min(0,Math.max(P.h*(1-P.z),P.oy));
+  };
+  P.resetZoom=()=>{ P.z=1; P.ox=0; P.oy=0; P.redesenhar(); };
 
   P.ajustar=function(){
     const r=cv.getBoundingClientRect();
     if(r.width<10||r.height<10) return;
     P.dpr=Math.min(window.devicePixelRatio||1,3);
-    P.w=r.width; P.h=r.height;
+    P.w=r.width; P.h=r.height; P.limitar();
     cv.width=Math.round(r.width*P.dpr); cv.height=Math.round(r.height*P.dpr);
     P.redesenhar();
   };
   P.redesenhar=function(previa){
     if(!P.w) return;
-    c.setTransform(P.dpr,0,0,P.dpr,0,0);
+    c.setTransform(P.dpr*P.z,0,0,P.dpr*P.z,P.dpr*P.ox,P.dpr*P.oy);
     o.fundo(c,P.w,P.h);
-    desenhaEls(c,o.els(),P.w,P.h,1);
+    desenhaEls(c,o.els(),P.w,P.h,1/P.z);
     if(previa){
-      c.save(); c.setLineDash([6,5]); c.strokeStyle=AZUL; c.lineWidth=2;
-      c.beginPath(); c.moveTo(previa.a.x*P.w,previa.a.y*P.h); c.lineTo(previa.b.x*P.w,previa.b.y*P.h); c.stroke(); c.restore();
+      const m=previa.tipo==='medida', ax=previa.a.x*P.w, ay=previa.a.y*P.h, bx=previa.b.x*P.w, by=previa.b.y*P.h;
+      c.save(); c.setLineDash([6/P.z,5/P.z]); c.strokeStyle=m?AZUL:P.cor; c.lineWidth=(m?2:P.esp)/P.z; c.lineCap='round';
+      if(previa.tipo==='ret') c.strokeRect(Math.min(ax,bx),Math.min(ay,by),Math.abs(bx-ax),Math.abs(by-ay));
+      else { c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
+      c.restore();
     }
   };
+  /* ponto da tela -> coordenada normalizada do desenho (considera zoom/pan) */
   P.ponto=function(e){
     const r=cv.getBoundingClientRect();
-    return { x:lim((e.clientX-r.left)/r.width), y:lim((e.clientY-r.top)/r.height) };
+    return { x:lim(((e.clientX-r.left)-P.ox)/P.z/r.width), y:lim(((e.clientY-r.top)-P.oy)/P.z/r.height) };
   };
   P.lupaEm=function(e){
     const pr=o.palco.getBoundingClientRect(), cr=cv.getBoundingClientRect();
@@ -351,47 +476,111 @@ function criarPrancha(o){
     let ly=y-158; if(ly<4) ly=y+34;
     lupa.style.left=lx+'px'; lupa.style.top=ly+'px';
   };
+  const snap=(ini,p)=>{
+    if(!P.orto||(P.ferr!=='medida'&&P.ferr!=='linha')) return p;
+    return Math.abs((p.x-ini.x)*P.w)>=Math.abs((p.y-ini.y)*P.h) ? {x:p.x,y:ini.y} : {x:ini.x,y:p.y};
+  };
+  const achar=p=>{
+    let best=null, bd=28/P.z;
+    for(const el of o.els()){ const d=distEl(el,p,P.w,P.h); if(d<bd){ bd=d; best=el; } }
+    return best?{el:best,base:clone(best)}:null;
+  };
+
+  /* gesto de dois dedos: zoom + arrastar */
+  function iniciarGesto(){
+    const [a,b]=[...ptrs.values()], r=cv.getBoundingClientRect();
+    gest={ d:Math.hypot(a.x-b.x,a.y-b.y)||1, mx:(a.x+b.x)/2-r.left, my:(a.y+b.y)/2-r.top, z:P.z, ox:P.ox, oy:P.oy };
+  }
+  function gesto(){
+    const [a,b]=[...ptrs.values()], r=cv.getBoundingClientRect();
+    const d=Math.hypot(a.x-b.x,a.y-b.y)||1, mx=(a.x+b.x)/2-r.left, my=(a.y+b.y)/2-r.top;
+    const z=Math.min(8,Math.max(1,gest.z*d/gest.d));
+    const wx=(gest.mx-gest.ox)/gest.z, wy=(gest.my-gest.oy)/gest.z;
+    P.z=z; P.ox=mx-wx*z; P.oy=my-wy*z; P.limitar(); P.redesenhar();
+  }
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+    const nz=Math.min(8,Math.max(1,P.z*(e.deltaY<0?1.15:1/1.15)));
+    const wx=(mx-P.ox)/P.z, wy=(my-P.oy)/P.z;
+    P.z=nz; P.ox=mx-wx*nz; P.oy=my-wy*nz; P.limitar(); P.redesenhar();
+  },{passive:false});
 
   cv.addEventListener('contextmenu',e=>e.preventDefault());
   cv.addEventListener('pointerdown',e=>{
     e.preventDefault();
     try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(ptrs.size>=2){
+      if(P.arr){ P.arr=null; P.sel=null; lupa.style.display='none'; P.redesenhar(); }
+      iniciarGesto(); return;
+    }
+    if(gest) return;
     const p=P.ponto(e);
     P.arr={ini:p,atual:p,pontos:[p]};
+    P.sel = P.ferr==='mover' ? achar(p) : null;
     P.lupaEm(e); lupa.style.display='block';
   });
   cv.addEventListener('pointermove',e=>{
+    if(ptrs.has(e.pointerId)) ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(gest){ e.preventDefault(); if(ptrs.size>=2) gesto(); return; }
     if(!P.arr) return;
     e.preventDefault();
-    P.arr.atual=P.ponto(e);
+    P.arr.atual=snap(P.arr.ini,P.ponto(e));
     if(P.ferr==='livre'){
       P.arr.pontos.push(P.arr.atual);
       P.redesenhar();
-      c.strokeStyle=TINTA; c.lineWidth=2.5; c.lineCap='round'; c.lineJoin='round';
+      c.strokeStyle=P.cor; c.lineWidth=P.esp/P.z; c.lineCap='round'; c.lineJoin='round';
       c.beginPath(); c.moveTo(P.arr.pontos[0].x*P.w,P.arr.pontos[0].y*P.h);
       for(const q of P.arr.pontos) c.lineTo(q.x*P.w,q.y*P.h);
       c.stroke();
-    } else if(P.ferr==='medida'){
-      P.redesenhar({a:P.arr.ini,b:P.arr.atual});
+    } else if(P.ferr==='medida'||P.ferr==='linha'||P.ferr==='ret'){
+      P.redesenhar({tipo:P.ferr,a:P.arr.ini,b:P.arr.atual});
+    } else if(P.ferr==='mover'&&P.sel){
+      aplicarMov(P.sel.el,P.sel.base,P.arr.atual.x-P.arr.ini.x,P.arr.atual.y-P.arr.ini.y);
+      P.redesenhar();
     }
     P.lupaEm(e);
   });
   function fim(){
     if(!P.arr) return;
     lupa.style.display='none';
-    const a=P.arr.ini, b=P.arr.atual, pts=P.arr.pontos;
-    P.arr=null;
+    const a=P.arr.ini, b=P.arr.atual, pts=P.arr.pontos, sel=P.sel;
+    P.arr=null; P.sel=null;
+    const dist=Math.hypot((b.x-a.x)*P.w,(b.y-a.y)*P.h);
+    const longe=dist>10/P.z;
     if(P.ferr==='medida'){
-      if(Math.hypot((b.x-a.x)*P.w,(b.y-a.y)*P.h)>10) pedirValor('medida',{a,b},P); else P.redesenhar();
+      if(longe) pedirValor('medida',{a,b},P); else P.redesenhar();
+    } else if(P.ferr==='linha'||P.ferr==='ret'){
+      if(longe) P.add({id:uid(),tipo:P.ferr,a,b,cor:P.cor,esp:P.esp});
+      P.redesenhar();
     } else if(P.ferr==='livre'){
-      if(pts.length>1){ o.els().push({id:uid(),tipo:'livre',pontos:pts}); salvarDepois(); }
+      if(pts.length>1) P.add({id:uid(),tipo:'livre',pontos:pts,cor:P.cor,esp:P.esp});
       P.redesenhar();
     } else if(P.ferr==='texto'){
       pedirValor('texto',{p:a},P); P.redesenhar();
+    } else if(P.ferr==='borracha'){
+      P.apagar(a); P.redesenhar();
+    } else if(P.ferr==='mover'){
+      if(!sel){ P.redesenhar(); return; }
+      if(dist>6/P.z){ P.mod(sel.el,sel.base); P.redesenhar(); }
+      else if(sel.el.tipo==='cota') pedirValor('editarMedida',{el:sel.el},P,sel.el.mm,sel.el.nome);
+      else if(sel.el.tipo==='texto') pedirValor('editarTexto',{el:sel.el},P,sel.el.txt);
+      else P.redesenhar();
     }
   }
-  cv.addEventListener('pointerup',fim);
-  cv.addEventListener('pointercancel',()=>{ P.arr=null; lupa.style.display='none'; P.redesenhar(); });
+  function soltar(e){
+    ptrs.delete(e.pointerId);
+    if(gest){ if(!ptrs.size) gest=null; return; }
+    fim();
+  }
+  cv.addEventListener('pointerup',soltar);
+  cv.addEventListener('pointercancel',e=>{
+    ptrs.delete(e.pointerId);
+    if(gest&&!ptrs.size) gest=null;
+    if(P.sel) aplicarMov(P.sel.el,P.sel.base,0,0);
+    P.arr=null; P.sel=null; lupa.style.display='none'; P.redesenhar();
+  });
   P.els=o.els;
   return P;
 }
@@ -409,6 +598,7 @@ const pCroqui=criarPrancha({
     c.stroke();
   }
 });
+pCroqui.btn=$('btnFerr'); rotuloFerr(pCroqui);
 /* área de desenho enquadrada: ocupa exatamente o que sobra da tela (sem rolar) */
 function ajustarPalco(){
   if($('tab-croqui').hidden) return;
@@ -429,59 +619,102 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   if(b.dataset.tab==='relatorio') atualizarResumo();
 }));
 
-/* ferramentas do croqui */
-document.querySelectorAll('[data-fer]').forEach(b=>b.addEventListener('click',()=>{
-  pCroqui.ferr=b.dataset.fer;
-  document.querySelectorAll('[data-fer]').forEach(x=>x.classList.toggle('ativo',x===b));
-}));
-$('btnDesfazer').addEventListener('click',()=>{
-  if(!estado.elementos.length){ toast('Nada para desfazer.'); return; }
-  estado.elementos.pop(); salvarDepois(); pCroqui.redesenhar();
+/* ---------- modal de ferramentas ---------- */
+let pAlvo=null;
+(function montarFerr(){
+  $('gFer').innerHTML=Object.entries(FERR).map(([k,v])=>'<button class="fer" data-pick="'+k+'"><span>'+v[0]+'</span>'+v[1]+'</button>').join('');
+  $('gCores').innerHTML=CORES.map(c=>'<button class="cor" data-cor="'+c+'" style="background:'+c+'" aria-label="Cor"></button>').join('');
+  $('gEsps').innerHTML=ESPS.map(e=>'<button class="fer" data-esp="'+e+'" aria-label="Espessura"><i style="height:'+Math.max(2,e)+'px"></i></button>').join('');
+})();
+function marcarFerr(){
+  if(!pAlvo) return;
+  document.querySelectorAll('#gFer [data-pick]').forEach(b=>b.classList.toggle('ativo',b.dataset.pick===pAlvo.ferr));
+  document.querySelectorAll('#gCores [data-cor]').forEach(b=>b.classList.toggle('ativo',b.dataset.cor===pAlvo.cor));
+  document.querySelectorAll('#gEsps [data-esp]').forEach(b=>b.classList.toggle('ativo',parseFloat(b.dataset.esp)===pAlvo.esp));
+  $('btnOrto').classList.toggle('ativo',!!pAlvo.orto);
+  $('btnZoom1').textContent='🔍 Zoom 1× (agora '+pAlvo.z.toFixed(1).replace('.',',')+'×)';
+}
+function abrirFerr(P){ pAlvo=P; marcarFerr(); $('modalFerr').hidden=false; }
+function fecharFerr(){ $('modalFerr').hidden=true; pAlvo=null; }
+$('gFer').addEventListener('click',e=>{
+  const b=e.target.closest('[data-pick]'); if(!b||!pAlvo) return;
+  pAlvo.ferr=b.dataset.pick; rotuloFerr(pAlvo); fecharFerr();
 });
+$('gCores').addEventListener('click',e=>{
+  const b=e.target.closest('[data-cor]'); if(!b||!pAlvo) return;
+  pAlvo.cor=b.dataset.cor; marcarFerr();
+});
+$('gEsps').addEventListener('click',e=>{
+  const b=e.target.closest('[data-esp]'); if(!b||!pAlvo) return;
+  pAlvo.esp=parseFloat(b.dataset.esp); marcarFerr();
+});
+$('btnOrto').addEventListener('click',()=>{ if(!pAlvo) return; pAlvo.orto=!pAlvo.orto; marcarFerr(); });
+$('btnZoom1').addEventListener('click',()=>{ if(!pAlvo) return; pAlvo.resetZoom(); marcarFerr(); });
+$('ferOk').addEventListener('click',fecharFerr);
+$('modalFerr').addEventListener('click',e=>{ if(e.target===$('modalFerr')) fecharFerr(); });
+
+/* ferramentas do croqui */
+$('btnFerr').addEventListener('click',()=>abrirFerr(pCroqui));
+$('btnDesfazer').addEventListener('click',()=>{ if(!pCroqui.desfazer()) toast('Nada para desfazer.'); });
+$('btnRefazer').addEventListener('click',()=>{ if(!pCroqui.refazer()) toast('Nada para refazer.'); });
 $('btnLimpar').addEventListener('click',()=>{
   if(!estado.elementos.length) return;
-  if(confirm('Limpar todo o croqui (medidas, traços e textos)?')){ estado.elementos=[]; salvar(); pCroqui.redesenhar(); }
+  if(confirm('Limpar todo o croqui (medidas, traços e textos)?')){ estado.elementos=[]; pCroqui.zerar(); salvar(); pCroqui.redesenhar(); }
 });
 
 /* ---------- modal medir/texto — medida SEMPRE digitada em mm ---------- */
 let pedido=null;
-function pedirValor(tipo,geom,alvo){
+function pedirValor(tipo,geom,alvo,valor,nome){
   pedido={tipo,geom,alvo};
-  $('mvTitulo').textContent = tipo==='medida' ? 'Digite a medida (mm)' : 'Digite o texto';
-  const c=$('mvCampo'); c.value='';
-  c.setAttribute('inputmode', tipo==='medida' ? 'decimal' : 'text');
+  const med=(tipo==='medida'||tipo==='editarMedida');
+  $('mvTitulo').textContent = {medida:'Digite a medida (mm)',editarMedida:'Editar medida (mm)',texto:'Digite o texto',editarTexto:'Editar texto'}[tipo];
+  const c=$('mvCampo');
+  c.value = valor!=null ? (med?String(valor).replace('.',','):valor) : '';
+  c.setAttribute('inputmode', med ? 'decimal' : 'text');
+  $('mvNome').hidden=!med; $('mvNome').value=nome||'';
   $('modalValor').hidden=false;
-  setTimeout(()=>c.focus(),60);
+  setTimeout(()=>{ c.focus(); if(valor!=null) c.select(); },60);
 }
 function fecharValor(){ pedido=null; $('modalValor').hidden=true; }
 function confirmarValor(){
   if(!pedido) return;
   const v=$('mvCampo').value.trim();
   if(!v){ toast('Digite um valor.'); return; }
-  const alvo=pedido.alvo;
-  if(pedido.tipo==='medida'){
-    const n=v.replace(',','.');
+  const alvo=pedido.alvo, t=pedido.tipo, nome=$('mvNome').value.trim();
+  let n=null;
+  if(t==='medida'||t==='editarMedida'){
+    n=v.replace(',','.');
     if(!/^\d+(\.\d+)?$/.test(n)||parseFloat(n)<=0){ toast('Medida inválida — use apenas números (mm).'); return; }
-    alvo.els().push({id:uid(),tipo:'cota',a:pedido.geom.a,b:pedido.geom.b,mm:n});
-  } else {
-    alvo.els().push({id:uid(),tipo:'texto',p:pedido.geom.p,txt:v});
   }
-  fecharValor(); salvarDepois(); alvo.redesenhar();
+  if(t==='medida'){
+    const el={id:uid(),tipo:'cota',a:pedido.geom.a,b:pedido.geom.b,mm:n}; if(nome) el.nome=nome;
+    alvo.add(el);
+  } else if(t==='texto'){
+    alvo.add({id:uid(),tipo:'texto',p:pedido.geom.p,txt:v,cor:alvo.cor});
+  } else {
+    const el=pedido.geom.el, antes=JSON.parse(JSON.stringify(el));
+    if(t==='editarMedida'){ el.mm=n; if(nome) el.nome=nome; else delete el.nome; } else el.txt=v;
+    alvo.mod(el,antes);
+  }
+  fecharValor(); alvo.redesenhar();
 }
 $('mvOk').addEventListener('click',confirmarValor);
 $('mvCancelar').addEventListener('click',()=>{ const a=pedido&&pedido.alvo; fecharValor(); if(a) a.redesenhar(); });
 $('mvCampo').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); confirmarValor(); } });
+$('mvNome').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); confirmarValor(); } });
 $('modalValor').addEventListener('click',e=>{ if(e.target===$('modalValor')){ const a=pedido&&pedido.alvo; fecharValor(); if(a) a.redesenhar(); } });
 
 /* ---------- fotos: fonte da verdade = estado.fotos ---------- */
 function addFoto(data){
-  estado.fotos.push({id:uid(),data,em:Date.now(),elementos:[]});
+  const id=uid(); banco.novas.add(id);
+  estado.fotos.push({id,data,em:Date.now(),elementos:[]});
   salvar(); renderFotos();
 }
 function excluirFoto(id){
   const i=estado.fotos.findIndex(f=>f.id===id);
   if(i<0) return;
   estado.fotos.splice(i,1);
+  banco.novas.delete(id); banco.apagadas.add(id);
   salvar();
   renderFotos();
   toast('Foto excluída definitivamente.');
@@ -533,6 +766,7 @@ const pFoto=criarPrancha({
   els:()=>{ const f=fotoAtual(); if(!f) return []; if(!f.elementos) f.elementos=[]; return f.elementos; },
   fundo:(c,w,h)=>{ c.fillStyle='#fff'; c.fillRect(0,0,w,h); if(edImg) c.drawImage(edImg,0,0,w,h); }
 });
+pFoto.btn=$('edFerr'); rotuloFerr(pFoto);
 function ajustarEditor(){
   if($('modalEditor').hidden||!edImg) return;
   const r=$('palcoF').getBoundingClientRect();
@@ -547,7 +781,7 @@ function abrirEditor(id){
   const f=estado.fotos.find(x=>x.id===id); if(!f) return;
   const im=new Image();
   im.onload=()=>{
-    edId=id; edImg=im;
+    edId=id; edImg=im; pFoto.zerar(); pFoto.z=1; pFoto.ox=0; pFoto.oy=0;
     if(!f.elementos) f.elementos=[];
     $('edTitulo').textContent='Foto '+(estado.fotos.indexOf(f)+1);
     $('modalEditor').hidden=false;
@@ -560,18 +794,12 @@ function fecharEditor(){
   $('modalEditor').hidden=true; edId=null; edImg=null;
   salvar(); renderFotos();
 }
-document.querySelectorAll('[data-ferf]').forEach(b=>b.addEventListener('click',()=>{
-  pFoto.ferr=b.dataset.ferf;
-  document.querySelectorAll('[data-ferf]').forEach(x=>x.classList.toggle('ativo',x===b));
-}));
-$('edDesfazer').addEventListener('click',()=>{
-  const els=pFoto.els();
-  if(!els.length){ toast('Nada para desfazer.'); return; }
-  els.pop(); salvarDepois(); pFoto.redesenhar();
-});
+$('edFerr').addEventListener('click',()=>abrirFerr(pFoto));
+$('edDesfazer').addEventListener('click',()=>{ if(!pFoto.desfazer()) toast('Nada para desfazer.'); });
+$('edRefazer').addEventListener('click',()=>{ if(!pFoto.refazer()) toast('Nada para refazer.'); });
 $('edLimpar').addEventListener('click',()=>{
   const f=fotoAtual(); if(!f||!f.elementos||!f.elementos.length) return;
-  if(confirm('Apagar todo o desenho desta foto? (a foto em si continua)')){ f.elementos=[]; salvar(); pFoto.redesenhar(); }
+  if(confirm('Apagar todo o desenho desta foto? (a foto em si continua)')){ f.elementos=[]; pFoto.zerar(); salvar(); pFoto.redesenhar(); }
 });
 $('edExcluir').addEventListener('click',()=>{
   if(edId&&confirm('Excluir esta foto? Não dá para desfazer.')){ const id=edId; $('modalEditor').hidden=true; edId=null; edImg=null; excluirFoto(id); }
@@ -631,7 +859,7 @@ for(const [id,k] of Object.entries(campos)){
 function pintaDados(){ for(const [id,k] of Object.entries(campos)) $(id).value=estado.dados[k]||''; }
 $('btnNovo').addEventListener('click',()=>{
   if(confirm('Começar um novo registro? O atual (croqui, fotos e dados) será apagado deste aparelho. Exporte um backup antes, se precisar.')){
-    estado=novoEstado(); pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Novo registro criado.');
+    estado=novoEstado(); banco.reset=true; pCroqui.zerar(); pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Novo registro criado.');
   }
 });
 
@@ -657,11 +885,14 @@ async function gerarRelatorio(){
   pCroqui.redesenhar();
   const d=estado.dados;
   const cotas=estado.elementos.filter(e=>e.tipo==='cota');
+  const sv={z:pCroqui.z,ox:pCroqui.ox,oy:pCroqui.oy};
+  Object.assign(pCroqui,{z:1,ox:0,oy:0}); pCroqui.redesenhar();
   const img=$('tela').toDataURL('image/png');
-  const linhas=cotas.map((c,i)=>'<li><b>M'+(i+1)+'</b> — '+esc(fmtMM(c.mm))+' mm</li>').join('')||'<li>Nenhuma medida lançada.</li>';
+  Object.assign(pCroqui,sv); pCroqui.redesenhar();
+  const linhas=cotas.map((c,i)=>'<li><b>M'+(i+1)+'</b> — '+(c.nome?esc(c.nome)+' — ':'')+esc(fmtMM(c.mm))+' mm</li>').join('')||'<li>Nenhuma medida lançada.</li>';
   const srcs=await Promise.all(estado.fotos.map(fotoParaRelatorio));
   const fotos=estado.fotos.map((f,i)=>{
-    const med=(f.elementos||[]).filter(e=>e.tipo==='cota').map(c=>fmtMM(c.mm)+' mm');
+    const med=(f.elementos||[]).filter(e=>e.tipo==='cota').map(c=>(c.nome?c.nome+' ':'')+fmtMM(c.mm)+' mm');
     return '<figure class="rfoto"><img src="'+srcs[i]+'"><figcaption>Foto '+(i+1)+(med.length?' — '+esc(med.join(' · ')):'')+'</figcaption></figure>';
   }).join('');
   $('relatorio').innerHTML =
@@ -694,7 +925,7 @@ $('inpBackup').addEventListener('change',e=>{
       const o=JSON.parse(r.result);
       if(!o||!o.dados||!Array.isArray(o.fotos)||!Array.isArray(o.elementos)) throw new Error('formato');
       if(!confirm('Importar este registro e substituir o atual?')) return;
-      estado=o; pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Backup importado.');
+      estado=o; estado.v=4; banco.reset=true; pCroqui.zerar(); pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Backup importado.');
     }catch(err){ toast('Arquivo de backup inválido.'); } };
   r.readAsText(f);
 });
@@ -706,6 +937,8 @@ async function iniciar(){
   if(salvo&&salvo.dados){
     estado=Object.assign(novoEstado(),salvo);
     estado.dados=Object.assign(novoEstado().dados,salvo.dados);
+    if(banco.modo==='idb'&&(salvo.v||0)<4){ estado.v=4; banco.reset=true; salvar(); } /* migra fotos do formato antigo */
+    estado.v=4;
   }
   pintaDados(); renderFotos(); ajustarCroqui();
 }
@@ -716,6 +949,10 @@ if(window.visualViewport) window.visualViewport.addEventListener('resize',aoRedi
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') salvar(); });
 window.addEventListener('pagehide',()=>{ pararCamera(); salvar(); });
 iniciar();
+if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>
