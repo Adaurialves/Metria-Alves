@@ -92,7 +92,12 @@ main{max-width:none;margin:0;padding:8px}
  .rTab th,.rTab td{border:1px solid #999;padding:5px 7px;text-align:left;font-size:12px}
  .rTab th{width:32%;background:#eee}
  #relatorio h2{font-size:14px;margin:12px 0 6px;border-bottom:1px solid #ccc;padding-bottom:2px}
- .rCroqui{width:100%;border:1px solid #999}
+ .rPag1{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;align-items:start}
+ .rPag1.sem{grid-template-columns:1fr}
+ .rCroquiBox h2,.rLado h2:first-child{margin-top:0}
+ .rCroqui{width:100%;max-height:19cm;object-fit:contain;border:1px solid #999}
+ .rLado .rTab th{width:38%}
+ .rFotosSec{break-before:page}
  .rMed{margin:0;padding-left:18px}.rObs{white-space:pre-wrap}
  .rFotos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
  .rfoto{margin:0;break-inside:avoid;border:1px solid #999;padding:4px}
@@ -163,7 +168,7 @@ main{max-width:none;margin:0;padding:8px}
   <section id="tab-relatorio" hidden>
     <p id="resumo" class="resumo"></p>
     <button class="fer destaque grande" id="btnGerar">📄 Gerar relatório / PDF</button>
-    <p class="dica">Abre a impressão do sistema — escolha <b>Salvar como PDF</b> ou imprima. Inclui dados, croqui, medidas em mm e todas as fotos numeradas (com o que você desenhou sobre elas).</p>
+    <p class="dica">Abre a impressão do sistema — escolha <b>Salvar como PDF</b> ou imprima. Na 1ª folha ficam juntos os dados, o croqui e as medidas em mm; depois vêm todas as fotos numeradas (com o que você desenhou sobre elas).</p>
   </section>
 
   <!-- AJUDA -->
@@ -912,13 +917,14 @@ async function gerarRelatorio(){
     const med=(f.elementos||[]).filter(e=>e.tipo==='cota').map(c=>(c.nome?c.nome+' ':'')+fmtMM(c.mm)+' mm');
     return '<figure class="rfoto"><img src="'+srcs[i]+'"><figcaption>Foto '+(i+1)+(med.length?' — '+esc(med.join(' · ')):'')+'</figcaption></figure>';
   }).join('');
+  const lado='<table class="rTab"><tr><th>Obra / Cliente</th><td>'+esc(d.obra||'—')+'</td></tr><tr><th>Local</th><td>'+esc(d.local||'—')+'</td></tr><tr><th>Técnico</th><td>'+esc(d.tecnico||'—')+'</td></tr><tr><th>Data</th><td>'+esc(d.data||'—')+'</td></tr></table>'+
+    (cotas.length?'<h2>Medidas (mm)</h2><ul class="rMed">'+linhas+'</ul>':'')+
+    (d.obs?'<h2>Observações</h2><p class="rObs">'+esc(d.obs)+'</p>':'');
+  const croqui=estado.elementos.length?'<div class="rCroquiBox"><h2>Croqui</h2><img class="rCroqui" src="'+img+'"></div>':'';
   $('relatorio').innerHTML =
     '<header class="rCab"><div><h1>METRIA</h1><p>Registro técnico de campo</p></div><div>'+esc(d.data||'')+'</div></header>'+
-    '<table class="rTab"><tr><th>Obra / Cliente</th><td>'+esc(d.obra||'—')+'</td></tr><tr><th>Local</th><td>'+esc(d.local||'—')+'</td></tr><tr><th>Técnico</th><td>'+esc(d.tecnico||'—')+'</td></tr></table>'+
-    (estado.elementos.length?'<h2>Croqui</h2><img class="rCroqui" src="'+img+'">':'')+
-    (cotas.length?'<h2>Medidas (mm)</h2><ul class="rMed">'+linhas+'</ul>':'')+
-    (d.obs?'<h2>Observações</h2><p class="rObs">'+esc(d.obs)+'</p>':'')+
-    (fotos?'<h2>Fotos ('+estado.fotos.length+')</h2><div class="rFotos">'+fotos+'</div>':'')+
+    '<section class="rPag1'+(croqui?'':' sem')+'">'+croqui+'<div class="rLado">'+lado+'</div></section>'+
+    (fotos?'<section class="rFotosSec"><h2>Fotos ('+estado.fotos.length+')</h2><div class="rFotos">'+fotos+'</div></section>':'')+
     '<div class="rAssin"><span></span>Técnico responsável</div>'+
     '<footer class="rPe">Gerado pelo METRIA em '+new Date().toLocaleString('pt-BR')+'</footer>';
   document.title='METRIA - '+(d.obra||'registro')+(d.data?' - '+d.data:'');
