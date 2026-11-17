@@ -170,7 +170,7 @@ main{max-width:none;margin:0;padding:8px}
   <section id="tab-ajuda" hidden>
     <h2 class="titulo">Ajuda</h2>
     <ul class="ajuda">
-      <li>🛠️ <b>Ferramentas:</b> toque no botão para abrir o menu — Medida (mm), Linha reta, Retângulo, Livre, Texto e Borracha, além de cor e espessura.</li>
+      <li>🛠️ <b>Ferramentas:</b> toque no botão para abrir o menu — Medida (mm), Linha reta, Retângulo, Círculo (arraste do centro até a borda), Livre, Texto e Borracha, além de cor e espessura.</li>
       <li>📏 <b>Medida:</b> toque e arraste; ao soltar, digite o valor em <b>mm</b> e, se quiser, um <b>nome</b> (ex.: largura da porta).</li>
       <li>✋ <b>Mover / editar:</b> arraste um item para movê-lo; toque numa medida ou texto para corrigir o valor.</li>
       <li>🔍 <b>Zoom:</b> use dois dedos para aproximar e arrastar o desenho. Em Ferramentas, <b>Zoom 1×</b> volta ao normal.</li>
@@ -190,7 +190,7 @@ main{max-width:none;margin:0;padding:8px}
         <button class="fer" id="btnImportar">⬆️ Importar</button>
         <input type="file" id="inpBackup" accept="application/json,.json" hidden>
       </div>
-      <p class="dica">Exporte para guardar ou passar o registro a outro celular.</p>
+      <p class="dica">Exporte para guardar ou passar o registro a outro celular: dá para baixar o arquivo ou compartilhar (WhatsApp, e-mail, Drive…).</p>
     </details>
   </section>
 </main>
@@ -255,6 +255,17 @@ main{max-width:none;margin:0;padding:8px}
     <button class="camBtn" id="btnFecharCam">✔️ Concluir</button>
     <button class="camBtn shutter" id="btnCapturar" aria-label="Tirar foto">📸</button>
     <span class="camDica">toque quantas vezes quiser</span>
+  </div>
+</div>
+
+<!-- Modal: arquivo exportado -->
+<div class="modal" id="modalExport" hidden>
+  <div class="cartao">
+    <h3>⬇️ Backup pronto</h3>
+    <p class="dica" id="expInfo" style="margin:0"></p>
+    <button class="fer destaque" id="btnBaixar">⬇️ Baixar arquivo</button>
+    <button class="fer" id="btnCompartilhar">📤 Compartilhar / salvar em…</button>
+    <button class="fer" id="expFechar">Fechar</button>
   </div>
 </div>
 
@@ -357,6 +368,10 @@ function desenhaEls(c,els,w,h,k){
       const a=P(el.a), b=P(el.b);
       c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
       c.strokeRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y));
+    } else if(el.tipo==='circ'){
+      const a=P(el.a), b=P(el.b);
+      c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
+      c.beginPath(); c.arc(a.x,a.y,Math.hypot(b.x-a.x,b.y-a.y),0,Math.PI*2); c.stroke();
     } else if(el.pontos&&el.pontos.length>1){
       c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
       c.beginPath(); const p0=P(el.pontos[0]); c.moveTo(p0.x,p0.y);
@@ -376,13 +391,14 @@ function distEl(el,p,w,h){
   if(el.tipo==='cota'||el.tipo==='linha') return distSeg(p,el.a,el.b,w,h);
   if(el.tipo==='ret'){ const A=el.a,B=el.b,c1={x:B.x,y:A.y},c2={x:A.x,y:B.y};
     return Math.min(distSeg(p,A,c1,w,h),distSeg(p,c1,B,w,h),distSeg(p,B,c2,w,h),distSeg(p,c2,A,w,h)); }
+  if(el.tipo==='circ') return Math.abs(Math.hypot((p.x-el.a.x)*w,(p.y-el.a.y)*h)-Math.hypot((el.b.x-el.a.x)*w,(el.b.y-el.a.y)*h));
   if(el.tipo==='texto'){ const L=(el.txt||'').length*8/w, y=el.p.y-5/h; return distSeg(p,{x:el.p.x,y},{x:el.p.x+L,y},w,h); }
   if(el.pontos){ let m=1e9; for(let i=1;i<el.pontos.length;i++) m=Math.min(m,distSeg(p,el.pontos[i-1],el.pontos[i],w,h)); return m; }
   return 1e9;
 }
 
 /* ---------- catálogo de ferramentas ---------- */
-const FERR={medida:['📏','Medida (mm)'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],livre:['✏️','Livre'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha']};
+const FERR={medida:['📏','Medida (mm)'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],circ:['⭕','Círculo'],livre:['✏️','Livre'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha']};
 const CORES=['#111827','#0b57d0','#dc2626','#16a34a','#f59e0b','#7c3aed'];
 const ESPS=[1.5,2.5,4,6];
 function rotuloFerr(P){ const f=FERR[P.ferr]; P.btn.textContent='🛠️ '+f[0]+' '+f[1]; }
@@ -452,6 +468,7 @@ function criarPrancha(o){
       const m=previa.tipo==='medida', ax=previa.a.x*P.w, ay=previa.a.y*P.h, bx=previa.b.x*P.w, by=previa.b.y*P.h;
       c.save(); c.setLineDash([6/P.z,5/P.z]); c.strokeStyle=m?AZUL:P.cor; c.lineWidth=(m?2:P.esp)/P.z; c.lineCap='round';
       if(previa.tipo==='ret') c.strokeRect(Math.min(ax,bx),Math.min(ay,by),Math.abs(bx-ax),Math.abs(by-ay));
+      else if(previa.tipo==='circ'){ c.beginPath(); c.arc(ax,ay,Math.hypot(bx-ax,by-ay),0,Math.PI*2); c.stroke(); }
       else { c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
       c.restore();
     }
@@ -534,7 +551,7 @@ function criarPrancha(o){
       c.beginPath(); c.moveTo(P.arr.pontos[0].x*P.w,P.arr.pontos[0].y*P.h);
       for(const q of P.arr.pontos) c.lineTo(q.x*P.w,q.y*P.h);
       c.stroke();
-    } else if(P.ferr==='medida'||P.ferr==='linha'||P.ferr==='ret'){
+    } else if(P.ferr==='medida'||P.ferr==='linha'||P.ferr==='ret'||P.ferr==='circ'){
       P.redesenhar({tipo:P.ferr,a:P.arr.ini,b:P.arr.atual});
     } else if(P.ferr==='mover'&&P.sel){
       aplicarMov(P.sel.el,P.sel.base,P.arr.atual.x-P.arr.ini.x,P.arr.atual.y-P.arr.ini.y);
@@ -551,7 +568,7 @@ function criarPrancha(o){
     const longe=dist>10/P.z;
     if(P.ferr==='medida'){
       if(longe) pedirValor('medida',{a,b},P); else P.redesenhar();
-    } else if(P.ferr==='linha'||P.ferr==='ret'){
+    } else if(P.ferr==='linha'||P.ferr==='ret'||P.ferr==='circ'){
       if(longe) P.add({id:uid(),tipo:P.ferr,a,b,cor:P.cor,esp:P.esp});
       P.redesenhar();
     } else if(P.ferr==='livre'){
@@ -911,12 +928,26 @@ $('btnGerar').addEventListener('click',gerarRelatorio);
 window.addEventListener('afterprint',()=>{ document.title='METRIA — Registro Técnico de Campo'; });
 
 /* ---------- backup ---------- */
+let arqExport=null;
 $('btnExportar').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify(estado)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='metria-'+(estado.dados.data||'registro')+'.json'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  const nome='metria-'+(estado.dados.data||'registro')+'.json';
+  arqExport=new File([JSON.stringify(estado)],nome,{type:'application/json'});
+  $('expInfo').textContent=nome+' · '+(arqExport.size/1048576).toFixed(1).replace('.',',')+' MB';
+  $('btnCompartilhar').hidden=!(navigator.canShare&&navigator.canShare({files:[arqExport]}));
+  $('modalExport').hidden=false;
 });
+$('btnBaixar').addEventListener('click',()=>{
+  if(!arqExport) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(arqExport); a.download=arqExport.name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast('Arquivo baixado.');
+});
+$('btnCompartilhar').addEventListener('click',async()=>{
+  if(!arqExport) return;
+  try{ await navigator.share({files:[arqExport],title:arqExport.name}); }
+  catch(e){ if(e.name!=='AbortError') toast('Não foi possível compartilhar. Use Baixar arquivo.'); }
+});
+$('expFechar').addEventListener('click',()=>{ $('modalExport').hidden=true; arqExport=null; });
 $('btnImportar').addEventListener('click',()=>$('inpBackup').click());
 $('inpBackup').addEventListener('change',e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f) return;
