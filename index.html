@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0f172a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title> Registro Técnico de Campo Por Adauri Alves</title>
+<title>Registro Técnico de Campo Por Adauri Alves</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;max-width:100%;overflow-x:hidden}
@@ -27,7 +27,7 @@ main{max-width:none;margin:0;padding:8px}
 .fer.ativo,.fer.destaque{background:#0b57d0;color:#fff;border-color:#0b57d0}
 .fer.perigo{color:#b91c1c;border-color:#fecaca}
 .fer.grande{width:100%;font-size:16px;min-height:52px}
-#palco{position:relative;height:60vh;min-height:200px;background:#fff;border:1px solid #cbd5e1;border-radius:12px}
+#palco{position:relative;height:60vh;min-height:200px;background:#e2e8f0;border:1px solid #cbd5e1;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #tela{width:100%;height:100%;display:block;border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair}
 .lupa{display:none;position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid #0b57d0;box-shadow:0 6px 18px rgba(2,6,23,.35);overflow:hidden;pointer-events:none;z-index:30;background:#fff}
 .lupa canvas{width:120px;height:120px;display:block}
@@ -39,7 +39,7 @@ main{max-width:none;margin:0;padding:8px}
 .xFoto{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(15,23,42,.75);color:#fff;font-size:15px;cursor:pointer}
 .form{display:flex;flex-direction:column;gap:10px}
 .form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:#334155}
-.form input,.form textarea,#mvCampo,#mvNome,#busca{font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
+.form input,.form textarea,#mvCampo,#mvNome,#mvTam,#busca{resize:none;font-family:inherit;font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
 .resumo{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px}
 .titulo{font-size:17px;margin:4px 0 8px}
 .ajuda{margin:0;padding-left:18px;font-size:14px;color:#334155;display:flex;flex-direction:column;gap:6px}
@@ -171,6 +171,7 @@ main{max-width:none;margin:0;padding:8px}
   <section id="tab-relatorio" hidden>
     <p id="resumo" class="resumo"></p>
     <button class="fer destaque grande" id="btnGerar">📄 Gerar relatório (PDF)</button>
+    <button class="fer grande" id="btnCSV" style="margin-top:8px">📊 Exportar medidas (CSV)</button>
     <p class="dica">Gera o PDF em A4 com <b>dados, croqui e medidas na mesma folha</b>, seguido das fotos numeradas (com o que você desenhou sobre elas). Você vê a pré-visualização e escolhe <b>Baixar</b>, <b>Compartilhar</b> ou <b>Imprimir</b>.</p>
   </section>
 
@@ -194,11 +195,16 @@ main{max-width:none;margin:0;padding:8px}
       <li>🖊️ <b>Desenhar sobre a foto:</b> toque na foto para abrir o editor, com as mesmas ferramentas (inclusive calibrar, área e ângulo). O desenho fica salvo na foto e vai no relatório.</li>
       <li>🗑️ O <b>✕</b> na foto (ou <b>Excluir foto</b> no editor) exclui <b>definitivamente</b>.</li>
       <li>📄 <b>Relatório:</b> gera o PDF com pré-visualização; baixe, compartilhe ou imprima.</li>
-      <li>💾 Tudo é salvo automaticamente neste aparelho.</li>
+      <li>🧲 <b>Ímã:</b> ao desenhar, o ponto gruda nas pontas e cantos de itens já existentes.</li>
+      <li>🔵 <b>Alças:</b> em <b>Mover / editar</b>, arraste as bolinhas das pontas para ajustar uma medida, linha, ângulo ou área. Medida em vermelho com ⚠ difere mais de 10% da escala calibrada.</li>
+      <li>🧭 <b>Perspectiva (só nas fotos):</b> toque os 4 cantos de um retângulo conhecido (porta, chapa), digite largura e altura reais em mm. A foto é corrigida e a escala já fica calibrada.</li>
+      <li>📊 <b>CSV:</b> em Relatório, exporta todas as medidas para planilha.</li>
+      <li>💾 Tudo é salvo automaticamente neste aparelho. Exporte backup de vez em quando (Backup → Exportar todos).</li>
     </ul>
     <details class="bloco"><summary>💾 Backup do registro</summary>
       <div class="toolbar" style="margin-top:10px">
         <button class="fer" id="btnExportar">⬇️ Exportar (.json)</button>
+        <button class="fer" id="btnExportarTodos">⬇️ Exportar todos</button>
         <button class="fer" id="btnImportar">⬆️ Importar</button>
         <input type="file" id="inpBackup" accept="application/json,.json" hidden>
       </div>
@@ -248,7 +254,8 @@ main{max-width:none;margin:0;padding:8px}
 <div class="modal" id="modalValor" hidden>
   <div class="cartao">
     <h3 id="mvTitulo">Medida (mm)</h3>
-    <input id="mvCampo" type="text" inputmode="decimal" autocomplete="off">
+    <textarea id="mvCampo" rows="1" inputmode="decimal" autocomplete="off"></textarea>
+    <select id="mvTam" hidden><option value="0.8">Texto pequeno</option><option value="1" selected>Texto normal</option><option value="1.6">Texto grande</option><option value="2.4">Texto enorme</option></select>
     <input id="mvNome" type="text" autocomplete="off" placeholder="Nome (opcional) — ex.: largura da porta">
     <div class="linha">
       <button class="fer" id="mvCancelar">Cancelar</button>
@@ -262,7 +269,7 @@ main{max-width:none;margin:0;padding:8px}
   <video id="videoCam" autoplay playsinline muted></video>
   <div class="camTopo">
     <span id="camContagem">0 fotos nesta sessão</span>
-    <button class="camBtn" id="btnVirar">🔄 Virar</button>
+    <span><button class="camBtn" id="btnLanterna" hidden>🔦</button> <button class="camBtn" id="btnVirar">🔄 Virar</button></span>
   </div>
   <div class="camBase">
     <button class="camBtn" id="btnFecharCam">✔️ Concluir</button>
@@ -309,7 +316,7 @@ const fmtData = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'') ? s.slice(8)+'/'+s.slice(
 const fmtDeg = g => (Math.round(g*10)/10).toFixed(1).replace('.',',')+'°';
 const fmtArea = mm2 => (mm2/1e6).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²';
 let toastTimer;
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,2600); }
+function toast(msg,ms){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,ms||2600); }
 
 /* ---------- estado do registro aberto ---------- */
 function novoEstado(){ return { v:5, ar:1, dados:{obra:'',local:'',tecnico:'',data:new Date().toISOString().slice(0,10),obs:''}, elementos:[], fotos:[] }; }
@@ -369,6 +376,7 @@ async function carregarReg(id){
   e.elementos=Array.isArray(m.elementos)?m.elementos:[]; e.fotos=Array.isArray(m.fotos)?m.fotos:[];
   await Promise.all(e.fotos.map(async f=>{ if(!f.data) f.data=await banco.get('foto:'+f.id); }));
   e.fotos=e.fotos.filter(f=>f.data); e.fotos.forEach(f=>{ if(!f.elementos) f.elementos=[]; });
+  if(m.ar&&m.ar!==1) e.arFixo=1;
   return e;
 }
 
@@ -388,7 +396,7 @@ function grausEm(a,v,b,ar){
 function itensMed(els,ar){
   const m=escalaDe(els,ar), out=[]; let n=0,a=0,g=0;
   for(const e of els){
-    if(e.tipo==='cota') out.push('M'+(++n)+' — '+(e.nome?e.nome+' — ':'')+fmtMM(e.mm)+' mm');
+    if(e.tipo==='cota'){ const v=parseFloat(e.mm), dif=m&&v>0&&Math.abs(U(e.a,e.b,ar)*m-v)/v>.1; out.push('M'+(++n)+' — '+(e.nome?e.nome+' — ':'')+fmtMM(e.mm)+' mm'+(dif?' ⚠ difere da escala':'')); }
     else if(e.tipo==='area'){ const t='A'+(++a)+' — '; out.push(m? t+fmtArea(areaU(e.pontos,ar)*m*m)+' · perímetro '+Math.round(perU(e.pontos,ar)*m)+' mm' : t+'sem escala'); }
     else if(e.tipo==='ang') out.push('Ângulo '+(++g)+' — '+fmtDeg(e.deg));
     else if(e.tipo==='ref') out.push('Referência de escala — '+fmtMM(e.mm)+' mm');
@@ -419,7 +427,8 @@ function desenhaEls(c,els,w,h,k,esc){
       const a=P(el.a), b=P(el.b);
       c.strokeStyle=AZUL; c.lineWidth=2*k; seg(a,b);
       const ang=ticks(a,b,8*k);
-      etiqueta(c,(el.nome?el.nome+' · ':'')+fmtMM(el.mm)+' mm',(a.x+b.x)/2+Math.cos(ang)*16*k,(a.y+b.y)/2+Math.sin(ang)*16*k,k,AZUL);
+      let aviso=false; if(esc&&esc.mmU){ const v=parseFloat(el.mm); aviso=v>0&&Math.abs(U(el.a,el.b,esc.ar)*esc.mmU-v)/v>.1; }
+      etiqueta(c,(aviso?'⚠ ':'')+(el.nome?el.nome+' · ':'')+fmtMM(el.mm)+' mm',(a.x+b.x)/2+Math.cos(ang)*16*k,(a.y+b.y)/2+Math.sin(ang)*16*k,k,aviso?'#dc2626':AZUL);
     } else if(el.tipo==='ref'){
       const a=P(el.a), b=P(el.b);
       c.strokeStyle=VERDE; c.lineWidth=2*k; c.setLineDash([7*k,4*k]); seg(a,b); c.setLineDash([]);
@@ -427,10 +436,11 @@ function desenhaEls(c,els,w,h,k,esc){
       etiqueta(c,'REF · '+fmtMM(el.mm)+' mm',(a.x+b.x)/2+Math.cos(ang)*16*k,(a.y+b.y)/2+Math.sin(ang)*16*k,k,VERDE);
     } else if(el.tipo==='texto'){
       const p=P(el.p);
-      c.font='600 '+(14*k)+'px system-ui,sans-serif';
-      const tw=c.measureText(el.txt).width;
-      c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(p.x-3*k,p.y-15*k,tw+6*k,20*k);
-      c.fillStyle=el.cor||TINTA; c.fillText(el.txt,p.x,p.y);
+      const sz=k*(el.tam||1), ls=String(el.txt).split('\n'), lh=18*sz;
+      c.font='600 '+(14*sz)+'px system-ui,sans-serif';
+      const tw=Math.max(...ls.map(l=>c.measureText(l).width));
+      c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(p.x-3*sz,p.y-15*sz,tw+6*sz,lh*ls.length+4*sz);
+      c.fillStyle=el.cor||TINTA; ls.forEach((l,i)=>c.fillText(l,p.x,p.y+i*lh));
     } else if(el.tipo==='linha'){
       c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k; seg(P(el.a),P(el.b));
     } else if(el.tipo==='ret'){
@@ -481,14 +491,14 @@ function distEl(el,p,w,h){
   if(el.tipo==='ret'){ const A=el.a,B=el.b,c1={x:B.x,y:A.y},c2={x:A.x,y:B.y};
     return Math.min(distSeg(p,A,c1,w,h),distSeg(p,c1,B,w,h),distSeg(p,B,c2,w,h),distSeg(p,c2,A,w,h)); }
   if(el.tipo==='circ') return Math.abs(Math.hypot((p.x-el.a.x)*w,(p.y-el.a.y)*h)-Math.hypot((el.b.x-el.a.x)*w,(el.b.y-el.a.y)*h));
-  if(el.tipo==='texto'){ const L=(el.txt||'').length*8/w, y=el.p.y-5/h; return distSeg(p,{x:el.p.x,y},{x:el.p.x+L,y},w,h); }
+  if(el.tipo==='texto'){ const t=el.tam||1; let m=1e9; String(el.txt||'').split('\n').forEach((l,i)=>{ const L=l.length*8*t/w, y=el.p.y-5*t/h+i*18*t/h; m=Math.min(m,distSeg(p,{x:el.p.x,y},{x:el.p.x+L,y},w,h)); }); return m; }
   if(el.pontos){ let m=1e9; const n=el.pontos.length, f=el.tipo==='area'?n:n-1;
     for(let i=0;i<f;i++) m=Math.min(m,distSeg(p,el.pontos[i],el.pontos[(i+1)%n],w,h)); return m; }
   return 1e9;
 }
 
 /* ---------- catálogo de ferramentas ---------- */
-const FERR={medida:['📏','Medida (mm)'],calib:['🎯','Calibrar escala'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],circ:['⭕','Círculo'],livre:['✏️','Livre'],area:['▦','Área'],angulo:['∠','Ângulo'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha']};
+const FERR={medida:['📏','Medida (mm)'],calib:['🎯','Calibrar escala'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],circ:['⭕','Círculo'],livre:['✏️','Livre'],area:['▦','Área'],angulo:['∠','Ângulo'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha'],retificar:['🧭','Perspectiva']};
 const CORES=['#111827','#0b57d0','#dc2626','#16a34a','#f59e0b','#7c3aed'];
 const ESPS=[1.5,2.5,4,6];
 function rotuloFerr(P){ const f=FERR[P.ferr]; P.btn.textContent='🛠️ '+f[0]+' '+f[1]; }
@@ -499,6 +509,8 @@ function aplicarMov(el,b,dx,dy){
   if(b.a) el.a=mv(b.a); if(b.b) el.b=mv(b.b); if(b.c) el.c=mv(b.c); if(b.p) el.p=mv(b.p);
   if(b.pontos) el.pontos=b.pontos.map(mv);
 }
+const ptsDe=el=>{ const r=[]; if(el.tipo==='texto'||el.tipo==='livre') return r; ['a','b','c'].forEach(k=>{ if(el[k]) r.push({k,q:el[k]}); }); (el.pontos||[]).forEach((q,i)=>r.push({k:'pontos',i,q})); return r; };
+const MAGN=['medida','calib','linha','ret','circ','angulo','area'];
 const DRAG=['medida','calib','linha','ret','circ'];
 function criarPrancha(o){
   const cv=o.canvas, c=cv.getContext('2d'), lupa=o.lupa, lc=o.lupaCanvas.getContext('2d');
@@ -559,6 +571,9 @@ function criarPrancha(o){
     o.fundo(c,P.w,P.h);
     const els=o.els(), ar=P.ar();
     desenhaEls(c,els,P.w,P.h,1/P.z,{ar,mmU:escalaDe(els,ar)});
+    if(P.ferr==='mover'){ c.save(); c.fillStyle='#fff'; c.strokeStyle=AZUL; c.lineWidth=1.5/P.z;
+      for(const el of els) for(const h of ptsDe(el)){ c.beginPath(); c.arc(h.q.x*P.w,h.q.y*P.h,5/P.z,0,7); c.fill(); c.stroke(); }
+      c.restore(); }
     if(P.seq.length){
       c.save(); c.strokeStyle=AZUL; c.fillStyle=AZUL; c.lineWidth=2/P.z; c.setLineDash([6/P.z,5/P.z]); c.beginPath();
       P.seq.forEach((q,i)=>{ const x=q.x*P.w,y=q.y*P.h; i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); c.setLineDash([]);
@@ -593,11 +608,18 @@ function criarPrancha(o){
     let ly=y-158; if(ly<4) ly=y+34;
     lupa.style.left=lx+'px'; lupa.style.top=ly+'px';
   };
+  P.ima=(p,ex)=>{ let b=null, bd=14/P.z;
+    for(const el of o.els()){ if(el===ex) continue; for(const h of ptsDe(el)){ const d=Math.hypot((h.q.x-p.x)*P.w,(h.q.y-p.y)*P.h); if(d<bd){ bd=d; b=h.q; } } }
+    return b?{x:b.x,y:b.y}:p; };
   const snap=(ini,p)=>{
+    { const mv=P.ferr==='mover', usa=MAGN.includes(P.ferr)||(mv&&P.sel&&P.sel.h); if(usa){ const q=P.ima(p,P.sel&&P.sel.el); if(q!==p) return q; } }
     if(!P.orto||(P.ferr!=='medida'&&P.ferr!=='linha'&&P.ferr!=='calib')) return p;
     return Math.abs((p.x-ini.x)*P.w)>=Math.abs((p.y-ini.y)*P.h) ? {x:p.x,y:ini.y} : {x:ini.x,y:p.y};
   };
   const achar=p=>{
+    { let hb=null, hd=22/P.z;
+      for(const el of o.els()) for(const h of ptsDe(el)){ const d=Math.hypot((h.q.x-p.x)*P.w,(h.q.y-p.y)*P.h); if(d<hd){ hd=d; hb={el,h}; } }
+      if(hb) return {el:hb.el,base:clone(hb.el),h:hb.h}; }
     let best=null, bd=28/P.z;
     for(const el of o.els()){ const d=distEl(el,p,P.w,P.h); if(d<bd){ bd=d; best=el; } }
     return best?{el:best,base:clone(best)}:null;
@@ -633,7 +655,7 @@ function criarPrancha(o){
       iniciarGesto(); return;
     }
     if(gest) return;
-    const p=P.ponto(e);
+    let p=P.ponto(e); if(MAGN.includes(P.ferr)) p=P.ima(p);
     P.arr={ini:p,atual:p,pontos:[p]};
     P.sel = P.ferr==='mover' ? achar(p) : null;
     P.lupaEm(e); lupa.style.display='block';
@@ -653,10 +675,11 @@ function criarPrancha(o){
       c.stroke();
     } else if(DRAG.includes(P.ferr)){
       P.redesenhar({tipo:P.ferr,a:P.arr.ini,b:P.arr.atual});
-    } else if((P.ferr==='angulo'||P.ferr==='area')&&P.seq.length){
+    } else if((P.ferr==='angulo'||P.ferr==='area'||P.ferr==='retificar')&&P.seq.length){
       P.redesenhar({tipo:'linha',a:P.seq[P.seq.length-1],b:P.arr.atual});
     } else if(P.ferr==='mover'&&P.sel){
-      aplicarMov(P.sel.el,P.sel.base,P.arr.atual.x-P.arr.ini.x,P.arr.atual.y-P.arr.ini.y);
+      if(P.sel.h){ const h=P.sel.h, q=P.arr.atual, el=P.sel.el; if(h.k==='pontos') el.pontos[h.i]={x:q.x,y:q.y}; else el[h.k]={x:q.x,y:q.y}; if(el.tipo==='ang') el.deg=grausEm(el.a,el.b,el.c,P.ar()); }
+      else aplicarMov(P.sel.el,P.sel.base,P.arr.atual.x-P.arr.ini.x,P.arr.atual.y-P.arr.ini.y);
       P.redesenhar();
     }
     P.lupaEm(e);
@@ -693,13 +716,18 @@ function criarPrancha(o){
         if(!P.escala()) toast('Área criada. Calibre a escala (🎯) para ver m².');
       } else { P.seq.push(b); if(P.seq.length===1) toast('Toque os cantos e feche tocando no 1º ponto.'); }
       P.redesenhar();
+    } else if(P.ferr==='retificar'){
+      P.seq.push(b);
+      if(P.seq.length===4){ const q=P.seq; P.seq=[]; pedirValor('retif',{q},P); }
+      else toast('Toque o canto '+(P.seq.length+1)+' de 4: '+['superior esquerdo','superior direito','inferior direito','inferior esquerdo'][P.seq.length]+'.');
+      P.redesenhar();
     } else if(P.ferr==='texto'){
       pedirValor('texto',{p:a},P); P.redesenhar();
     } else if(P.ferr==='borracha'){
       P.apagar(a); P.redesenhar();
     } else if(P.ferr==='mover'){
       if(!sel){ P.redesenhar(); return; }
-      if(dist>6/P.z){ P.mod(sel.el,sel.base); P.redesenhar(); }
+      if(dist>6/P.z){ if(sel.el.tipo==='ang') sel.el.deg=grausEm(sel.el.a,sel.el.b,sel.el.c,P.ar()); P.mod(sel.el,sel.base); P.redesenhar(); }
       else if(sel.el.tipo==='cota') pedirValor('editarMedida',{el:sel.el},P,sel.el.mm,sel.el.nome);
       else if(sel.el.tipo==='ref') pedirValor('editarCalib',{el:sel.el},P,sel.el.mm);
       else if(sel.el.tipo==='texto') pedirValor('editarTexto',{el:sel.el},P,sel.el.txt);
@@ -746,7 +774,14 @@ function ajustarPalco(){
   const livre=window.innerHeight-docTop-dicaH-10-baixo;
   palco.style.height=Math.max(200,Math.floor(livre))+'px';
 }
-function ajustarCroqui(){ ajustarPalco(); pCroqui.ajustar(); if(pCroqui.w>10&&pCroqui.h>10) estado.ar=pCroqui.w/pCroqui.h; }
+function ajustarCroqui(){
+  ajustarPalco();
+  const r=palco.getBoundingClientRect(); if(r.width<10||r.height<10) return;
+  if(!estado.arFixo){ estado.ar=r.width/r.height; estado.arFixo=1; salvarDepois(); }
+  const R=estado.ar; let w=r.width, h=w/R; if(h>r.height){ h=r.height; w=h*R; }
+  const t=$('tela'); t.style.width=Math.floor(w)+'px'; t.style.height=Math.floor(h)+'px';
+  pCroqui.ajustar();
+}
 
 /* ---------- abas ---------- */
 function irAba(nome){
@@ -774,7 +809,7 @@ function marcarFerr(){
   $('btnZoom1').textContent='🔍 Zoom 1× (agora '+pAlvo.z.toFixed(1).replace('.',',')+'×)';
   $('escInfo').textContent = pAlvo.escala() ? '🎯 Escala calibrada — medidas, retângulos, círculos e áreas saem em mm.' : '🎯 Sem escala — use Calibrar sobre algo de medida conhecida.';
 }
-function abrirFerr(P){ pAlvo=P; marcarFerr(); $('modalFerr').hidden=false; }
+function abrirFerr(P){ pAlvo=P; const rb=document.querySelector('#gFer [data-pick="retificar"]'); if(rb) rb.hidden=(P!==pFoto); marcarFerr(); $('modalFerr').hidden=false; }
 function fecharFerr(){ $('modalFerr').hidden=true; pAlvo=null; }
 $('gFer').addEventListener('click',e=>{
   const b=e.target.closest('[data-pick]'); if(!b||!pAlvo) return;
@@ -782,6 +817,7 @@ $('gFer').addEventListener('click',e=>{
   if(P.ferr==='calib') toast('Arraste sobre algo de medida conhecida.');
   if(P.ferr==='area') toast('Toque os cantos; feche tocando no 1º ponto.');
   if(P.ferr==='angulo') toast('Toque uma ponta, o vértice e a outra ponta.');
+  if(P.ferr==='retificar') toast('Toque os 4 cantos de um retângulo conhecido: sup. esq., sup. dir., inf. dir., inf. esq.',4500);
 });
 $('gCores').addEventListener('click',e=>{
   const b=e.target.closest('[data-cor]'); if(!b||!pAlvo) return;
@@ -807,16 +843,16 @@ $('btnLimpar').addEventListener('click',()=>{
 
 /* ---------- modal medir/texto — medida SEMPRE digitada em mm ---------- */
 let pedido=null;
-const NUM=['medida','editarMedida','calib','editarCalib'];
+const NUM=['medida','editarMedida','calib','editarCalib','retif'];
 function pedirValor(tipo,geom,alvo,valor,nome){
   pedido={tipo,geom,alvo};
   const med=NUM.includes(tipo);
   $('mvTitulo').textContent = tipo==='medida'&&valor!=null ? 'Medida (mm) · sugerida pela escala'
-    : {medida:'Digite a medida (mm)',editarMedida:'Editar medida (mm)',calib:'Comprimento real deste trecho (mm)',editarCalib:'Editar referência (mm)',texto:'Digite o texto',editarTexto:'Editar texto'}[tipo];
+    : {medida:'Digite a medida (mm)',editarMedida:'Editar medida (mm)',calib:'Comprimento real deste trecho (mm)',editarCalib:'Editar referência (mm)',texto:'Digite o texto',editarTexto:'Editar texto',retif:'Retângulo conhecido: largura real (mm)'}[tipo];
   const c=$('mvCampo');
   c.value = valor!=null ? (med?String(valor).replace('.',','):valor) : '';
   c.setAttribute('inputmode', med ? 'decimal' : 'text');
-  const comNome=(tipo==='medida'||tipo==='editarMedida');
+  const comNome=(tipo==='medida'||tipo==='editarMedida'||tipo==='retif'); const ehTxt=(tipo==='texto'||tipo==='editarTexto'); $('mvTam').hidden=!ehTxt; if(ehTxt) $('mvTam').value=String((geom&&geom.el&&geom.el.tam)||1); c.rows=ehTxt?3:1; $('mvNome').placeholder=tipo==='retif'?'Altura real (mm)':'Nome (opcional) — ex.: largura da porta';
   $('mvNome').hidden=!comNome; $('mvNome').value=nome||'';
   $('modalValor').hidden=false;
   setTimeout(()=>{ c.focus(); if(valor!=null) c.select(); },60);
@@ -832,6 +868,11 @@ function confirmarValor(){
     n=v.replace(',','.');
     if(!/^\d+(\.\d+)?$/.test(n)||parseFloat(n)<=0){ toast('Medida inválida — use apenas números (mm).'); return; }
   }
+  if(t==='retif'){
+    const hh=nome.replace(',','.');
+    if(!/^\d+(\.\d+)?$/.test(hh)||parseFloat(hh)<=0){ toast('Digite também a altura real (mm).'); return; }
+    const q=pedido.geom.q; fecharValor(); retificarFoto(q,parseFloat(n),parseFloat(hh)); return;
+  }
   if(t==='medida'){
     const el={id:uid(),tipo:'cota',a:pedido.geom.a,b:pedido.geom.b,mm:n}; if(nome) el.nome=nome;
     alvo.add(el);
@@ -839,19 +880,19 @@ function confirmarValor(){
     alvo.add({id:uid(),tipo:'ref',a:pedido.geom.a,b:pedido.geom.b,mm:n});
     toast('Escala calibrada. Agora as medidas vêm sugeridas.');
   } else if(t==='texto'){
-    alvo.add({id:uid(),tipo:'texto',p:pedido.geom.p,txt:v,cor:alvo.cor});
+    alvo.add({id:uid(),tipo:'texto',p:pedido.geom.p,txt:v,cor:alvo.cor,tam:parseFloat($('mvTam').value)||1});
   } else {
     const el=pedido.geom.el, antes=JSON.parse(JSON.stringify(el));
     if(t==='editarMedida'){ el.mm=n; if(nome) el.nome=nome; else delete el.nome; }
     else if(t==='editarCalib') el.mm=n;
-    else el.txt=v;
+    else { el.txt=v; el.tam=parseFloat($('mvTam').value)||1; }
     alvo.mod(el,antes);
   }
   fecharValor(); alvo.redesenhar();
 }
 $('mvOk').addEventListener('click',confirmarValor);
 $('mvCancelar').addEventListener('click',()=>{ const a=pedido&&pedido.alvo; fecharValor(); if(a) a.redesenhar(); });
-$('mvCampo').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); confirmarValor(); } });
+$('mvCampo').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!(pedido&&/texto/i.test(pedido.tipo))){ e.preventDefault(); confirmarValor(); } });
 $('mvNome').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); confirmarValor(); } });
 $('modalValor').addEventListener('click',e=>{ if(e.target===$('modalValor')){ const a=pedido&&pedido.alvo; fecharValor(); if(a) a.redesenhar(); } });
 
@@ -887,7 +928,7 @@ function renderFotos(){
     : 'Nenhuma foto ainda. Em <b>Câmera</b> você tira várias fotos seguidas sem sair da câmera.';
   atualizarResumo();
 }
-function canvasComprimido(orig,w,h,max=1600,q=.75){
+function canvasComprimido(orig,w,h,max=2048,q=.78){
   let W=w,H=h;
   if(Math.max(W,H)>max){ const k=max/Math.max(W,H); W=Math.round(W*k); H=Math.round(H*k); }
   const c=document.createElement('canvas'); c.width=W; c.height=H;
@@ -945,6 +986,51 @@ function fecharEditor(){
   $('modalEditor').hidden=true; edId=null; edImg=null;
   salvar(); renderFotos();
 }
+function homog(S,D){
+  const A=[]; for(let i=0;i<4;i++){ const [x,y]=S[i],[u,v]=D[i];
+    A.push([x,y,1,0,0,0,-x*u,-y*u,u]); A.push([0,0,0,x,y,1,-x*v,-y*v,v]); }
+  for(let c=0;c<8;c++){ let p=c; for(let r=c+1;r<8;r++) if(Math.abs(A[r][c])>Math.abs(A[p][c])) p=r;
+    if(Math.abs(A[p][c])<1e-12) return null; [A[c],A[p]]=[A[p],A[c]];
+    for(let r=0;r<8;r++){ if(r===c) continue; const f=A[r][c]/A[c][c]; for(let k=c;k<9;k++) A[r][k]-=f*A[c][k]; } }
+  return [...A.map((r,i)=>r[8]/r[i]),1];
+}
+function inv3(m){ const [a,b,c,d,e,f,g,h,i]=m, A=e*i-f*h, B=-(d*i-f*g), C=d*h-e*g, det=a*A+b*B+c*C; if(!det||!isFinite(det)) return null;
+  return [A,-(b*i-c*h),b*f-c*e,B,a*i-c*g,-(a*f-c*d),C,-(a*h-b*g),a*e-b*d].map(x=>x/det); }
+const hap=(M,x,y)=>{ const w=M[6]*x+M[7]*y+M[8]; return [(M[0]*x+M[1]*y+M[2])/w,(M[3]*x+M[4]*y+M[5])/w,w]; };
+function retificarFoto(q,Wmm,Hmm){
+  const f=fotoAtual(); if(!f||!edImg) return;
+  if(f.elementos.length&&!confirm('Corrigir a perspectiva substitui a foto e apaga os desenhos dela. Continuar?')) return;
+  toast('Corrigindo perspectiva…');
+  setTimeout(()=>{ try{
+    const iw=edImg.naturalWidth, ih=edImg.naturalHeight, S=q.map(p=>[p.x*iw,p.y*ih]);
+    const wpx=(Math.hypot(S[1][0]-S[0][0],S[1][1]-S[0][1])+Math.hypot(S[2][0]-S[3][0],S[2][1]-S[3][1]))/2, sc=wpx/Wmm;
+    const D=[[0,0],[Wmm*sc,0],[Wmm*sc,Hmm*sc],[0,Hmm*sc]], H=homog(S,D), Hi=H&&inv3(H); if(!Hi) throw 0;
+    const cs=[[0,0],[iw,0],[iw,ih],[0,ih]].map(c=>hap(H,c[0],c[1])), sg=Math.sign(cs[0][2]);
+    if(cs.some(c=>Math.sign(c[2])!==sg||!isFinite(c[0])||!isFinite(c[1]))) throw 0;
+    const xs=cs.map(c=>c[0]), ys=cs.map(c=>c[1]), x0=Math.min(...xs), y0=Math.min(...ys), ex=Math.max(...xs)-x0, ey=Math.max(...ys)-y0;
+    const k=Math.min(1,2048/Math.max(ex,ey)); if(k<.05) throw 0;
+    const ow=Math.max(2,Math.round(ex*k)), oh=Math.max(2,Math.round(ey*k));
+    const cv=document.createElement('canvas'); cv.width=iw; cv.height=ih; const cx=cv.getContext('2d'); cx.drawImage(edImg,0,0);
+    const sd=cx.getImageData(0,0,iw,ih).data, out=document.createElement('canvas'); out.width=ow; out.height=oh;
+    const oc=out.getContext('2d'), od=oc.createImageData(ow,oh), o=od.data;
+    for(let v=0;v<oh;v++) for(let u=0;u<ow;u++){
+      const [sx,sy]=hap(Hi,x0+u/k,y0+v/k), i=(v*ow+u)*4;
+      if(sx>=0&&sy>=0&&sx<iw-1&&sy<ih-1){
+        const xi=sx|0, yi=sy|0, fx=sx-xi, fy=sy-yi, p=(yi*iw+xi)*4, p2=p+iw*4;
+        for(let ch=0;ch<3;ch++) o[i+ch]=(sd[p+ch]*(1-fx)+sd[p+4+ch]*fx)*(1-fy)+(sd[p2+ch]*(1-fx)+sd[p2+4+ch]*fx)*fy;
+        o[i+3]=255;
+      } else { o[i]=o[i+1]=o[i+2]=255; o[i+3]=255; }
+    }
+    oc.putImageData(od,0,0);
+    const nz=v=>Math.min(1,Math.max(0,v));
+    f.data=out.toDataURL('image/jpeg',.85);
+    f.elementos=[{id:uid(),tipo:'ref',a:{x:nz((0-x0)*k/ow),y:nz((0-y0)*k/oh)},b:{x:nz((D[1][0]-x0)*k/ow),y:nz((0-y0)*k/oh)},mm:String(Wmm)}];
+    banco.novas.add(f.id); salvar();
+    const im=new Image();
+    im.onload=()=>{ edImg=im; pFoto.zerar(); pFoto.z=1; pFoto.ox=0; pFoto.oy=0; ajustarEditor(); toast('Perspectiva corrigida. Escala já calibrada pela largura informada.',4000); };
+    im.src=f.data;
+  }catch(err){ toast('Não foi possível corrigir. Confira a ordem dos 4 cantos.'); } },60);
+}
 $('edFerr').addEventListener('click',()=>abrirFerr(pFoto));
 $('edDesfazer').addEventListener('click',()=>{ if(!pFoto.desfazer()) toast('Nada para desfazer.'); });
 $('edRefazer').addEventListener('click',()=>{ if(!pFoto.refazer()) toast('Nada para refazer.'); });
@@ -958,7 +1044,7 @@ $('edExcluir').addEventListener('click',()=>{
 $('edFechar').addEventListener('click',fecharEditor);
 
 /* ---------- câmera interna: várias fotos sem fechar ---------- */
-let fluxo=null, ladoCam='environment', sessao=0, ultimaCaptura=0;
+let fluxo=null, ladoCam='environment', sessao=0, ultimaCaptura=0, luz=false;
 function pararCamera(){
   if(fluxo){ fluxo.getTracks().forEach(t=>t.stop()); fluxo=null; }
   const v=$('videoCam'); if(v) v.srcObject=null;
@@ -971,8 +1057,9 @@ async function ligarCamera(){
     $('inpCameraNativa').click(); return;
   }
   try{
-    fluxo=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:ladoCam},width:{ideal:1920},height:{ideal:1080}}});
+    fluxo=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:ladoCam},width:{ideal:3840},height:{ideal:2160}}});
     const v=$('videoCam'); v.srcObject=fluxo; await v.play().catch(()=>{});
+    try{ const tr=fluxo.getVideoTracks()[0], cp=(tr.getCapabilities&&tr.getCapabilities())||{}; luz=false; $('btnLanterna').hidden=!cp.torch; }catch(e){ $('btnLanterna').hidden=true; }
   }catch(e){
     $('modalCamera').hidden=true;
     toast('Sem acesso à câmera interna — usando a câmera do sistema.');
@@ -988,6 +1075,7 @@ $('btnFecharCam').addEventListener('click',()=>{
   if(sessao) toast(sessao+' foto(s) adicionada(s).');
 });
 $('btnVirar').addEventListener('click',async()=>{ ladoCam=ladoCam==='environment'?'user':'environment'; await ligarCamera(); });
+$('btnLanterna').addEventListener('click',async()=>{ try{ luz=!luz; await fluxo.getVideoTracks()[0].applyConstraints({advanced:[{torch:luz}]}); }catch(e){ luz=false; toast('Lanterna indisponível.'); } });
 $('btnCapturar').addEventListener('click',()=>{
   if(Date.now()-ultimaCaptura<350) return;
   ultimaCaptura=Date.now();
@@ -1044,6 +1132,7 @@ async function duplicarReg(id){
 async function excluirReg(id){
   const r=indice.find(x=>x.id===id); if(!r) return;
   if(!confirm('Excluir "'+(r.obra||'Sem nome')+'" com todas as fotos e desenhos? Não dá para desfazer.')) return;
+  if(id===regId) clearTimeout(timerSalvar);
   await fila;
   const meta=await banco.get('reg:'+id);
   const dels=['reg:'+id].concat(((meta&&meta.fotos)||[]).map(f=>'foto:'+f.id));
@@ -1201,8 +1290,9 @@ async function gerarRelatorio(){
   try{
     if(!$('tab-croqui').hidden) ajustarCroqui();
     const pags=await montarPaginas();
-    const urls=pags.map(cv=>cv.toDataURL('image/jpeg',.88));
-    const imgs=urls.map((u,i)=>({ bytes:Uint8Array.from(atob(u.split(',')[1]),ch=>ch.charCodeAt(0)), w:pags[i].width, h:pags[i].height }));
+    const blobs=await Promise.all(pags.map(cv=>new Promise(r=>cv.toBlob(r,'image/jpeg',.88))));
+    const imgs=await Promise.all(blobs.map(async(b,i)=>({ bytes:new Uint8Array(await b.arrayBuffer()), w:pags[i].width, h:pags[i].height })));
+    const urls=blobs.map(b=>URL.createObjectURL(b));
     const blob=montarPDF(imgs), d=estado.dados;
     const nome=('METRIA - '+(d.obra||'registro')+(d.data?' - '+d.data:'')).replace(/[\\/:*?"<>|]+/g,' ').trim()+'.pdf';
     relPdf={blob,nome,urls,file:new File([blob],nome,{type:'application/pdf'})};
@@ -1216,7 +1306,7 @@ async function gerarRelatorio(){
   btn.disabled=false;
 }
 $('btnGerar').addEventListener('click',gerarRelatorio);
-$('prevFechar').addEventListener('click',()=>{ $('modalPrev').hidden=true; $('prevCorpo').innerHTML=''; relPdf=null; $('relatorio').innerHTML=''; });
+$('prevFechar').addEventListener('click',()=>{ $('modalPrev').hidden=true; $('prevCorpo').innerHTML=''; if(relPdf) relPdf.urls.forEach(u=>URL.revokeObjectURL(u)); relPdf=null; $('relatorio').innerHTML=''; });
 $('prevBaixar').addEventListener('click',()=>{
   if(!relPdf) return;
   const a=document.createElement('a'); a.href=URL.createObjectURL(relPdf.blob); a.download=relPdf.nome; a.click();
@@ -1234,10 +1324,10 @@ $('prevImprimir').addEventListener('click',()=>{
 });
 
 /* ---------- backup: exportar / importar (com validação rigorosa) ---------- */
-let arqExport=null;
+let arqExport=null, arqBkp=true;
 $('btnExportar').addEventListener('click',()=>{
   const nome='metria-'+((estado.dados.obra||'registro').replace(/[^\w\-]+/g,'_').slice(0,30))+'-'+(estado.dados.data||'')+'.json';
-  arqExport=new File([JSON.stringify(estado)],nome,{type:'application/json'});
+  arqExport=new File([JSON.stringify(estado)],nome,{type:'application/json'}); arqBkp=true;
   $('expInfo').textContent=nome+' · '+(arqExport.size/1048576).toFixed(1).replace('.',',')+' MB';
   $('btnCompartilhar').hidden=!(navigator.canShare&&navigator.canShare({files:[arqExport]}));
   $('modalExport').hidden=false;
@@ -1246,15 +1336,47 @@ $('btnBaixar').addEventListener('click',()=>{
   if(!arqExport) return;
   const a=document.createElement('a');
   a.href=URL.createObjectURL(arqExport); a.download=arqExport.name; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast('Arquivo baixado.');
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast('Arquivo baixado.'); if(arqBkp) marcarBackup();
 });
 $('btnCompartilhar').addEventListener('click',async()=>{
   if(!arqExport) return;
-  try{ await navigator.share({files:[arqExport],title:arqExport.name}); }
+  try{ await navigator.share({files:[arqExport],title:arqExport.name}); if(arqBkp) marcarBackup(); }
   catch(e){ if(e.name!=='AbortError') toast('Não foi possível compartilhar. Use Baixar arquivo.'); }
 });
 $('expFechar').addEventListener('click',()=>{ $('modalExport').hidden=true; arqExport=null; });
 $('btnImportar').addEventListener('click',()=>$('inpBackup').click());
+function marcarBackup(){ banco.tx([['bkp',Date.now()]],[]).catch(()=>{}); }
+function abrirExport(file,bkp){
+  arqExport=file; arqBkp=bkp;
+  $('expInfo').textContent=file.name+' · '+(file.size/1048576).toFixed(1).replace('.',',')+' MB';
+  $('btnCompartilhar').hidden=!(navigator.canShare&&navigator.canShare({files:[file]}));
+  $('modalExport').hidden=false;
+}
+$('btnExportarTodos').addEventListener('click',async()=>{
+  toast('Reunindo todos os registros…'); await salvar();
+  try{
+    const regs=[]; for(const r of indice){ const e=await carregarReg(r.id); if(e) regs.push(e); }
+    abrirExport(new File([JSON.stringify({metria:1,registros:regs})],'metria-todos-'+new Date().toISOString().slice(0,10)+'.json',{type:'application/json'}),true);
+  }catch(e){ toast('Não foi possível reunir tudo (memória?). Exporte um registro por vez.'); }
+});
+$('btnCSV').addEventListener('click',async()=>{
+  const L=[['Origem','Item','Nome','Valor','Unidade']];
+  const add=(orig,els,ar)=>{ const m=escalaDe(els,ar); let n=0,a=0,g=0;
+    els.forEach(e=>{
+      if(e.tipo==='cota') L.push([orig,'M'+(++n),e.nome||'',fmtMM(e.mm),'mm']);
+      else if(e.tipo==='ref') L.push([orig,'Referência','',fmtMM(e.mm),'mm']);
+      else if(e.tipo==='ang') L.push([orig,'Ângulo '+(++g),'',fmtMM(Math.round(e.deg*10)/10),'graus']);
+      else if(e.tipo==='area'&&m){ a++; L.push([orig,'A'+a+' área','',fmtMM(+(areaU(e.pontos,ar)*m*m/1e6).toFixed(3)),'m²']); L.push([orig,'A'+a+' perímetro','',String(Math.round(perU(e.pontos,ar)*m)),'mm']); }
+    }); };
+  add('Croqui',estado.elementos,estado.ar||1);
+  for(let i=0;i<estado.fotos.length;i++){ const f=estado.fotos[i]; if(!(f.elementos||[]).length) continue;
+    let im=null; try{ im=await carregarImg(f.data); }catch(e){}
+    add('Foto '+(i+1),f.elementos,im?im.naturalWidth/im.naturalHeight:1); }
+  if(L.length<2){ toast('Nenhuma medida neste registro.'); return; }
+  const csv='\ufeff'+L.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const d=estado.dados, nome=('medidas-'+(d.obra||'registro')+(d.data?'-'+d.data:'')).replace(/[^\w\-]+/g,'_').slice(0,60)+'.csv';
+  abrirExport(new File([csv],nome,{type:'text/csv'}),false);
+});
 
 /* sanitização: só entra o que tem formato conhecido; ids novos; fotos só se forem imagens reais */
 const COR_OK=/^#[0-9a-fA-F]{6}$/, IMG_OK=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/]+=*$/;
@@ -1274,7 +1396,7 @@ function sanEl(e){
     const m=String(e.mm).replace(',','.'); if(!/^\d+(\.\d+)?$/.test(m)||parseFloat(m)<=0) return null;
     o.mm=m; if(t==='cota'&&e.nome) o.nome=String(e.nome).slice(0,80);
   }
-  if(t==='texto'){ o.p=pt(e.p); o.txt=String(e.txt==null?'':e.txt).slice(0,200); }
+  if(t==='texto'){ o.p=pt(e.p); o.txt=String(e.txt==null?'':e.txt).slice(0,600); o.tam=Math.min(4,Math.max(.5,num(e.tam,1))); }
   if(t==='livre'||t==='area'){
     if(!Array.isArray(e.pontos)||e.pontos.length<(t==='area'?3:2)) return null;
     o.pontos=e.pontos.slice(0,5000).map(pt);
@@ -1286,7 +1408,7 @@ function sanearBackup(o){
   if(!o||typeof o!=='object'||!o.dados||typeof o.dados!=='object'||!Array.isArray(o.fotos)||!Array.isArray(o.elementos)) return null;
   const e=novoEstado(), s=(v,n)=>String(v==null?'':v).slice(0,n), d=o.dados;
   e.dados={obra:s(d.obra,200),local:s(d.local,200),tecnico:s(d.tecnico,200),data:/^\d{4}-\d{2}-\d{2}$/.test(d.data||'')?d.data:e.dados.data,obs:s(d.obs,5000)};
-  e.ar=num(o.ar,1)>0.2&&num(o.ar,1)<5?num(o.ar,1):1;
+  e.ar=num(o.ar,1)>0.2&&num(o.ar,1)<5?num(o.ar,1):1; if(e.ar!==1) e.arFixo=1;
   e.elementos=sanElementos(o.elementos);
   let descartadas=0;
   o.fotos.slice(0,300).forEach(f=>{
@@ -1301,13 +1423,17 @@ $('inpBackup').addEventListener('change',e=>{
   const r=new FileReader();
   r.onload=async()=>{
     let o=null; try{ o=JSON.parse(r.result); }catch(err){}
-    const s=sanearBackup(o);
-    if(!s){ toast('Arquivo de backup inválido.'); return; }
-    await salvar();
-    estado=s.e; regId=uid(); banco.novas=new Set(estado.fotos.map(x=>x.id)); banco.apagadas.clear();
-    estado.dados.obra=(estado.dados.obra||'Sem nome')+' (importado)';
-    await salvar(); aplicarEstado(); irAba('registros');
-    toast('Backup importado como novo registro'+(s.descartadas?' — '+s.descartadas+' foto(s) inválida(s) ignorada(s)':'')+'.');
+    const lista=o&&Array.isArray(o.registros)?o.registros:[o];
+    const ss=lista.map(sanearBackup).filter(Boolean);
+    if(!ss.length){ toast('Arquivo de backup inválido.'); return; }
+    await salvar(); let desc=0;
+    for(const s of ss){
+      estado=s.e; regId=uid(); banco.novas=new Set(estado.fotos.map(x=>x.id)); banco.apagadas.clear();
+      estado.dados.obra=(estado.dados.obra||'Sem nome')+' (importado)'; desc+=s.descartadas;
+      await salvar();
+    }
+    aplicarEstado(); irAba('registros');
+    toast(ss.length+' registro(s) importado(s) como novo(s)'+(desc?' — '+desc+' foto(s) inválida(s) ignorada(s)':'')+'.');
   };
   r.onerror=()=>toast('Não foi possível ler o arquivo.');
   r.readAsText(f);
@@ -1344,10 +1470,31 @@ window.addEventListener('orientationchange',()=>setTimeout(aoRedimensionar,250))
 if(window.visualViewport) window.visualViewport.addEventListener('resize',aoRedimensionar);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') salvar(); });
 window.addEventListener('pagehide',()=>{ pararCamera(); salvar(); });
-iniciar();
+async function lembreteBackup(){
+  const b=await banco.get('bkp');
+  if(b==null){ banco.tx([['bkp',Date.now()]],[]).catch(()=>{}); return; }
+  const dias=Math.floor((Date.now()-b)/864e5);
+  if(dias>=7&&indice.length) setTimeout(()=>toast('💾 Faz '+dias+' dias sem backup. Vá em Ajuda → Backup e exporte.',6000),1500);
+}
+iniciar().then(lembreteBackup);
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  const tinhaSW=!!navigator.serviceWorker.controller; let recarregando=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(tinhaSW&&!recarregando){ recarregando=true; location.reload(); } });
+  const avisoAtt=reg=>{
+    if($('avisoAtt')) return;
+    const d=document.createElement('div'); d.id='avisoAtt';
+    d.style.cssText='position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));z-index:95;background:#0b57d0;color:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:14px';
+    const t=document.createElement('span'); t.textContent='🔄 Nova versão do METRIA disponível.';
+    const b=document.createElement('button'); b.className='fer'; b.style.flex='0 0 auto'; b.textContent='Atualizar';
+    b.onclick=()=>{ if(reg&&reg.waiting) reg.waiting.postMessage('SKIP_WAITING'); else location.reload(); };
+    d.append(t,b); document.body.appendChild(d);
+  };
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(reg=>{
+    if(reg.waiting&&navigator.serviceWorker.controller) avisoAtt(reg);
+    reg.addEventListener('updatefound',()=>{ const nw=reg.installing; if(nw) nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller) avisoAtt(reg); }); });
+    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') reg.update().catch(()=>{}); });
+  }).catch(()=>{}));
 }
 </script>
 </body>
