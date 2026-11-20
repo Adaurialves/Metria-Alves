@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -13,21 +13,20 @@ html,body{margin:0;max-width:100%;overflow-x:hidden}
 body{font:16px/1.45 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#0f172a;padding-bottom:env(safe-area-inset-bottom)}
 [hidden]{display:none!important}
 .topo{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0f172a;color:#fff;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top))}
-.marca{font-weight:800;font-size:18px;letter-spacing:.5px}
-.marca .sub{font-weight:400;font-size:11px;opacity:.75;display:block}
+.marca{font-weight:800;font-size:18px;letter-spacing:.5px;min-width:0}
+.marca .sub{font-weight:400;font-size:11px;opacity:.75;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
 .save{font-size:12px;background:#1e293b;border-radius:999px;padding:4px 10px;white-space:nowrap}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
 .tab{flex:1 1 auto;min-height:42px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:10px;font-size:14px;font-weight:600;padding:6px 10px;cursor:pointer;touch-action:manipulation}
 .tab.ativo{background:#0b57d0;border-color:#0b57d0;color:#fff}
 .badge{background:rgba(0,0,0,.15);border-radius:999px;padding:1px 7px;font-size:12px}
 main{max-width:none;margin:0;padding:8px}
-#tab-fotos,#tab-dados,#tab-relatorio,#tab-ajuda{max-width:760px;margin:0 auto}
+#tab-registros,#tab-fotos,#tab-dados,#tab-relatorio,#tab-ajuda{max-width:760px;margin:0 auto}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .fer{flex:1 1 auto;min-height:44px;border:1px solid #cbd5e1;background:#fff;border-radius:10px;font-size:14px;font-weight:600;padding:8px 10px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .fer.ativo,.fer.destaque{background:#0b57d0;color:#fff;border-color:#0b57d0}
 .fer.perigo{color:#b91c1c;border-color:#fecaca}
 .fer.grande{width:100%;font-size:16px;min-height:52px}
-/* área de desenho: a altura é calculada por JS para ocupar exatamente o que sobra da tela */
 #palco{position:relative;height:60vh;min-height:200px;background:#fff;border:1px solid #cbd5e1;border-radius:12px}
 #tela{width:100%;height:100%;display:block;border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair}
 .lupa{display:none;position:absolute;width:120px;height:120px;border-radius:50%;border:3px solid #0b57d0;box-shadow:0 6px 18px rgba(2,6,23,.35);overflow:hidden;pointer-events:none;z-index:30;background:#fff}
@@ -40,20 +39,25 @@ main{max-width:none;margin:0;padding:8px}
 .xFoto{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(15,23,42,.75);color:#fff;font-size:15px;cursor:pointer}
 .form{display:flex;flex-direction:column;gap:10px}
 .form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:#334155}
-.form input,.form textarea,#mvCampo,#mvNome{font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
+.form input,.form textarea,#mvCampo,#mvNome,#busca{font-size:16px;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;width:100%}
 .resumo{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;font-size:14px}
 .titulo{font-size:17px;margin:4px 0 8px}
 .ajuda{margin:0;padding-left:18px;font-size:14px;color:#334155;display:flex;flex-direction:column;gap:6px}
 .bloco{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-top:10px}
 .bloco summary{font-weight:700;font-size:14px;cursor:pointer}
+.reg{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:10px;margin-bottom:8px}
+.reg.atual{border-color:#0b57d0;box-shadow:0 0 0 2px #dbeafe}
+.regInfo b{display:block;font-size:15px;overflow-wrap:anywhere}
+.regInfo span{font-size:12px;color:#475569}
+.regAc{display:flex;gap:6px}
+.regAc .fer{min-height:40px;font-size:13px;padding:6px}
 .modal{position:fixed;inset:0;background:rgba(2,6,23,.6);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
 .cartao{background:#fff;border-radius:14px;padding:16px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
 .cartao h3{margin:0;font-size:16px}
 .linha{display:flex;gap:8px}
 #modalValor{z-index:70}
-/* modal de ferramentas (folha inferior) */
 .modal.sheet{z-index:65;align-items:flex-end;padding:0}
-.ferCard{max-width:520px;border-radius:18px 18px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.ferCard{max-width:520px;border-radius:18px 18px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
 .gFer{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .gFer .fer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:66px;font-size:12px;padding:4px}
 .gFer .fer span{font-size:24px;line-height:1}
@@ -72,7 +76,6 @@ main{max-width:none;margin:0;padding:8px}
 .camBtn.shutter{width:74px;height:74px;font-size:30px;background:#fff;border:4px solid #0b57d0}
 .camDica{color:#fff;font-size:11px;opacity:.8;max-width:80px}
 .modal.camera.flash::after{content:'';position:absolute;inset:0;background:#fff;opacity:.7}
-/* editor de foto */
 .modal.editor{background:#f1f5f9;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom))}
 .modal.editor .toolbar{margin:0}
 .modal.editor .fer{min-height:40px;padding:6px 8px;font-size:13px}
@@ -80,38 +83,34 @@ main{max-width:none;margin:0;padding:8px}
 #edTitulo{font-weight:700;font-size:15px}
 #palcoF{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;background:#0f172a;border-radius:12px;overflow:hidden}
 #telaF{display:block;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair;background:#fff}
+/* pré-visualização do PDF */
+.modal.prev{z-index:75;background:#cbd5e1;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:0}
+.prevTopo{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0f172a;color:#fff;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top));font-size:14px}
+.prevTopo .fer{flex:0 0 auto;min-height:38px}
+.prevCorpo{flex:1;min-height:0;overflow:auto;padding:10px;-webkit-overflow-scrolling:touch}
+.prevCorpo img{display:block;width:100%;max-width:760px;margin:0 auto 10px;background:#fff;box-shadow:0 2px 10px rgba(2,6,23,.25)}
+.prevBase{display:flex;gap:8px;padding:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #cbd5e1}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:90;max-width:92vw;text-align:center}
 #relatorio{display:none}
 @media print{
- @page{margin:12mm}
+ @page{size:A4;margin:0}
  body>*:not(#relatorio){display:none!important}
- #relatorio{display:block;font-size:12px;color:#000}
- .rCab{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:10px}
- .rCab h1{margin:0;font-size:22px}.rCab p{margin:0;font-size:11px;color:#333}
- .rTab{width:100%;border-collapse:collapse;margin-bottom:8px}
- .rTab th,.rTab td{border:1px solid #999;padding:5px 7px;text-align:left;font-size:12px}
- .rTab th{width:32%;background:#eee}
- #relatorio h2{font-size:14px;margin:12px 0 6px;border-bottom:1px solid #ccc;padding-bottom:2px}
- .rCroqui{width:100%;border:1px solid #999}
- .rMed{margin:0;padding-left:18px}.rObs{white-space:pre-wrap}
- .rFotos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
- .rfoto{margin:0;break-inside:avoid;border:1px solid #999;padding:4px}
- .rfoto img{width:100%;max-height:8cm;object-fit:contain;display:block}
- .rfoto figcaption{font-size:11px;text-align:center;padding-top:3px}
- .rAssin{margin-top:36px;text-align:center;font-size:11px}
- .rAssin span{display:block;border-top:1px solid #000;width:70%;margin:0 auto 4px}
- .rPe{margin-top:14px;font-size:10px;color:#555;text-align:right}
+ body{background:#fff;padding:0}
+ #relatorio{display:block}
+ #relatorio img{display:block;width:100%;break-after:page}
+ #relatorio img:last-child{break-after:auto}
 }
 </style>
 </head>
 <body>
 
 <header class="topo">
-  <div class="marca">📐 METRIA<span class="sub">registro técnico de campo</span></div>
+  <div class="marca">📐 METRIA<span class="sub" id="subMarca">registro técnico de campo</span></div>
   <span id="saveStatus" class="save">salvo ✓</span>
 </header>
 
 <nav class="tabs">
+  <button class="tab" data-tab="registros">🗂️ Registros</button>
   <button class="tab ativo" data-tab="croqui">✏️ Croqui</button>
   <button class="tab" data-tab="fotos">📷 Fotos <span id="contFotos" class="badge">0</span></button>
   <button class="tab" data-tab="dados">📋 Dados</button>
@@ -120,6 +119,16 @@ main{max-width:none;margin:0;padding:8px}
 </nav>
 
 <main>
+  <!-- REGISTROS -->
+  <section id="tab-registros" hidden>
+    <div class="toolbar">
+      <button class="fer destaque" id="btnNovoReg" style="flex:2 1 150px">➕ Novo registro</button>
+      <button class="fer" id="btnImportarReg">⬆️ Importar backup</button>
+    </div>
+    <input type="search" id="busca" placeholder="Buscar por obra ou local…" autocomplete="off">
+    <div id="listaReg" style="margin-top:10px"></div>
+  </section>
+
   <!-- CROQUI -->
   <section id="tab-croqui">
     <div class="toolbar">
@@ -155,33 +164,36 @@ main{max-width:none;margin:0;padding:8px}
       <label>Técnico responsável<input id="dTecnico" type="text"></label>
       <label>Data<input id="dData" type="date"></label>
       <label>Observações<textarea id="dObs" rows="4" placeholder="Anotações de campo..."></textarea></label>
-      <button class="fer perigo" id="btnNovo">🆕 Novo registro (apaga o atual)</button>
     </div>
   </section>
 
   <!-- RELATÓRIO -->
   <section id="tab-relatorio" hidden>
     <p id="resumo" class="resumo"></p>
-    <button class="fer destaque grande" id="btnGerar">📄 Gerar relatório / PDF</button>
-    <p class="dica">Abre a impressão do sistema — escolha <b>Salvar como PDF</b> ou imprima. Inclui dados, croqui, medidas em mm e todas as fotos numeradas (com o que você desenhou sobre elas).</p>
+    <button class="fer destaque grande" id="btnGerar">📄 Gerar relatório (PDF)</button>
+    <p class="dica">Gera o PDF em A4 com <b>dados, croqui e medidas na mesma folha</b>, seguido das fotos numeradas (com o que você desenhou sobre elas). Você vê a pré-visualização e escolhe <b>Baixar</b>, <b>Compartilhar</b> ou <b>Imprimir</b>.</p>
   </section>
 
   <!-- AJUDA -->
   <section id="tab-ajuda" hidden>
     <h2 class="titulo">Ajuda</h2>
     <ul class="ajuda">
-      <li>🛠️ <b>Ferramentas:</b> toque no botão para abrir o menu — Medida (mm), Linha reta, Retângulo, Círculo (arraste do centro até a borda), Livre, Texto e Borracha, além de cor e espessura.</li>
-      <li>📏 <b>Medida:</b> toque e arraste; ao soltar, digite o valor em <b>mm</b> e, se quiser, um <b>nome</b> (ex.: largura da porta).</li>
-      <li>✋ <b>Mover / editar:</b> arraste um item para movê-lo; toque numa medida ou texto para corrigir o valor.</li>
+      <li>🗂️ <b>Registros:</b> cada obra é um registro. Crie, abra, duplique ou exclua na aba Registros; tudo fica salvo neste aparelho.</li>
+      <li>🛠️ <b>Ferramentas:</b> toque no botão para abrir o menu — Medida (mm), Linha, Retângulo, Círculo, Livre, Texto, Área, Ângulo, Calibrar, Mover e Borracha, além de cor e espessura.</li>
+      <li>📏 <b>Medida:</b> toque e arraste; ao soltar, digite o valor em <b>mm</b> e, se quiser, um <b>nome</b> (ex.: largura da porta). Com a escala calibrada, o valor já vem sugerido (você pode corrigir).</li>
+      <li>🎯 <b>Calibrar:</b> arraste sobre algo de medida conhecida (uma trena, uma porta) e digite o comprimento real em mm. Depois disso medidas, retângulos, círculos e áreas saem calculados. Vale a última referência; para recalibrar, faça outra.</li>
+      <li>▦ <b>Área:</b> toque os cantos um a um e feche tocando no primeiro ponto. Mostra a área em m² e o perímetro em mm (precisa de escala).</li>
+      <li>∠ <b>Ângulo:</b> toque 3 pontos: uma ponta, o vértice e a outra ponta. O ângulo aparece em graus.</li>
+      <li>✋ <b>Mover / editar:</b> arraste um item para movê-lo; toque numa medida, referência ou texto para corrigir o valor.</li>
       <li>🔍 <b>Zoom:</b> use dois dedos para aproximar e arrastar o desenho. Em Ferramentas, <b>Zoom 1×</b> volta ao normal.</li>
       <li>📐 <b>Travar 0°/90°:</b> em Ferramentas, deixa medidas e linhas só na horizontal ou vertical (desligado por padrão).</li>
       <li>🧽 <b>Borracha:</b> toque sobre um traço, medida ou texto para apagá-lo (dá para desfazer).</li>
       <li>↩️ ↪️ <b>Desfazer / Refazer</b> funcionam para qualquer ação, inclusive apagar.</li>
       <li>🔍 <b>Lupa:</b> ao tocar para desenhar, uma bola de aumento mostra o ponto do toque.</li>
       <li>📷 <b>Fotos:</b> em <b>Câmera</b> você tira várias fotos seguidas; toque em <b>Concluir</b> ao terminar. <b>Galeria</b> importa várias de uma vez.</li>
-      <li>🖊️ <b>Desenhar sobre a foto:</b> toque na foto para abrir o editor, com o mesmo menu de ferramentas do croqui. O desenho fica salvo na foto e vai no relatório.</li>
+      <li>🖊️ <b>Desenhar sobre a foto:</b> toque na foto para abrir o editor, com as mesmas ferramentas (inclusive calibrar, área e ângulo). O desenho fica salvo na foto e vai no relatório.</li>
       <li>🗑️ O <b>✕</b> na foto (ou <b>Excluir foto</b> no editor) exclui <b>definitivamente</b>.</li>
-      <li>📄 <b>Relatório:</b> gera a página com dados, croqui, medidas e fotos — use “Salvar como PDF”.</li>
+      <li>📄 <b>Relatório:</b> gera o PDF com pré-visualização; baixe, compartilhe ou imprima.</li>
       <li>💾 Tudo é salvo automaticamente neste aparelho.</li>
     </ul>
     <details class="bloco"><summary>💾 Backup do registro</summary>
@@ -190,7 +202,7 @@ main{max-width:none;margin:0;padding:8px}
         <button class="fer" id="btnImportar">⬆️ Importar</button>
         <input type="file" id="inpBackup" accept="application/json,.json" hidden>
       </div>
-      <p class="dica">Exporte para guardar ou passar o registro a outro celular: dá para baixar o arquivo ou compartilhar (WhatsApp, e-mail, Drive…).</p>
+      <p class="dica">Exporta o registro aberto. Ao importar, o backup entra como um <b>novo registro</b> — nada do que você já tem é substituído.</p>
     </details>
   </section>
 </main>
@@ -223,6 +235,7 @@ main{max-width:none;margin:0;padding:8px}
     <div class="cores" id="gCores"></div>
     <div class="rot">Espessura</div>
     <div class="esps" id="gEsps"></div>
+    <p class="dica" id="escInfo" style="margin:0"></p>
     <div class="linha">
       <button class="fer" id="btnOrto">📐 Travar 0°/90°</button>
       <button class="fer" id="btnZoom1">🔍 Zoom 1×</button>
@@ -258,7 +271,7 @@ main{max-width:none;margin:0;padding:8px}
   </div>
 </div>
 
-<!-- Modal: arquivo exportado -->
+<!-- Modal: arquivo exportado (backup) -->
 <div class="modal" id="modalExport" hidden>
   <div class="cartao">
     <h3>⬇️ Backup pronto</h3>
@@ -269,93 +282,149 @@ main{max-width:none;margin:0;padding:8px}
   </div>
 </div>
 
+<!-- Pré-visualização do PDF -->
+<div class="modal prev" id="modalPrev" hidden>
+  <div class="prevTopo"><b id="prevInfo">Relatório</b><button class="fer" id="prevFechar">✕ Fechar</button></div>
+  <div class="prevCorpo" id="prevCorpo"></div>
+  <div class="prevBase">
+    <button class="fer destaque" id="prevBaixar">⬇️ Baixar PDF</button>
+    <button class="fer" id="prevCompart">📤 Compartilhar</button>
+    <button class="fer" id="prevImprimir">🖨️ Imprimir</button>
+  </div>
+</div>
+
 <div id="toast" hidden></div>
 
 <!-- Somente para impressão -->
 <section id="relatorio"></section>
-
 <script>
 'use strict';
-/* ===== METRIA — arquivo único, 100% local (sem Firebase) =====
-   Dados salvos no próprio aparelho (IndexedDB). Hospedagem: GitHub. */
+/* ===== METRIA — arquivo único, 100% local =====
+   Dados salvos no próprio aparelho (IndexedDB). Vários registros. Hospedagem: GitHub. */
 
 const $ = id => document.getElementById(id);
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtMM = m => String(m).replace('.', ',');
+const fmtData = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'') ? s.slice(8)+'/'+s.slice(5,7)+'/'+s.slice(0,4) : (s||'');
+const fmtDeg = g => (Math.round(g*10)/10).toFixed(1).replace('.',',')+'°';
+const fmtArea = mm2 => (mm2/1e6).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²';
 let toastTimer;
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,2400); }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,2600); }
 
-/* ---------- estado único ---------- */
-function novoEstado(){ return { v:4, dados:{obra:'',local:'',tecnico:'',data:new Date().toISOString().slice(0,10),obs:''}, elementos:[], fotos:[] }; }
-let estado = novoEstado();
+/* ---------- estado do registro aberto ---------- */
+function novoEstado(){ return { v:5, ar:1, dados:{obra:'',local:'',tecnico:'',data:new Date().toISOString().slice(0,10),obs:''}, elementos:[], fotos:[] }; }
+let estado = novoEstado(), regId = uid(), indice = [];
 
-/* ---------- persistência: IndexedDB (fotos grandes) c/ fallback ---------- */
+/* ---------- persistência: IndexedDB (chave/valor) c/ fallback em localStorage ----------
+   idx            -> lista de registros [{id,obra,local,data,upd,nf,nm}]
+   reg:<id>       -> dados + desenhos (fotos só com id/elementos)
+   foto:<fotoId>  -> imagem (gravada uma única vez)
+   ultimo         -> último registro aberto */
 const banco = {
-  db:null, modo:'idb', novas:new Set(), apagadas:new Set(), reset:false,
+  db:null, modo:'idb', novas:new Set(), apagadas:new Set(),
   abrir(){ return new Promise(res=>{ try{
       const r=indexedDB.open('metria',1);
       r.onupgradeneeded=()=>{ r.result.createObjectStore('kv'); };
       r.onsuccess=()=>{ banco.db=r.result; res(); };
       r.onerror=()=>{ banco.modo='local'; res(); };
     }catch(e){ banco.modo='local'; res(); } }); },
-  /* v4: 'estado' guarda só dados/desenhos; cada foto fica em 'foto:<id>' (gravada uma única vez) */
-  ler(){ return new Promise(res=>{
-      if(banco.modo==='local'){ try{ res(JSON.parse(localStorage.getItem('metria_estado')||'null')); }catch(e){ res(null); } return; }
-      const s=banco.db.transaction('kv','readonly').objectStore('kv');
-      const t=s.get('estado');
-      t.onerror=()=>res(null);
-      t.onsuccess=()=>{
-        const e=t.result;
-        if(!e||!Array.isArray(e.fotos)){ res(e||null); return; }
-        const pend=e.fotos.filter(f=>!f.data);
-        if(!pend.length){ res(e); return; }
-        let rest=pend.length;
-        const ok=()=>{ if(--rest===0){ e.fotos=e.fotos.filter(x=>x.data); res(e); } };
-        pend.forEach(f=>{ const g=s.get('foto:'+f.id); g.onsuccess=()=>{ f.data=g.result||null; ok(); }; g.onerror=ok; });
-      }; }); },
-  gravar(v){ return new Promise((res,rej)=>{
-      if(banco.modo==='local'){ try{ localStorage.setItem('metria_estado',JSON.stringify(v)); res(); }catch(e){ rej(e); } return; }
-      const reset=banco.reset, N=[...banco.novas], A=[...banco.apagadas];
-      const meta=Object.assign({},v,{v:4,fotos:v.fotos.map(f=>({id:f.id,em:f.em,elementos:f.elementos||[]}))});
+  get(k){ return new Promise(res=>{
+      if(banco.modo==='local'){ try{ res(JSON.parse(localStorage.getItem('metria:'+k)||'null')); }catch(e){ res(null); } return; }
+      try{
+        const t=banco.db.transaction('kv','readonly').objectStore('kv').get(k);
+        t.onsuccess=()=>res(t.result===undefined?null:t.result); t.onerror=()=>res(null);
+      }catch(e){ res(null); } }); },
+  tx(puts,dels){ return new Promise((res,rej)=>{
+      if(banco.modo==='local'){ try{ puts.forEach(([k,v])=>localStorage.setItem('metria:'+k,JSON.stringify(v))); dels.forEach(k=>localStorage.removeItem('metria:'+k)); res(); }catch(e){ rej(e); } return; }
       const tx=banco.db.transaction('kv','readwrite'), st=tx.objectStore('kv');
-      if(reset) st.clear();
-      st.put(meta,'estado');
-      (reset?v.fotos.map(f=>f.id):N).forEach(id=>{ const f=v.fotos.find(x=>x.id===id); if(f) st.put(f.data,'foto:'+id); });
-      A.forEach(id=>st.delete('foto:'+id));
-      tx.oncomplete=()=>{ N.forEach(i=>banco.novas.delete(i)); A.forEach(i=>banco.apagadas.delete(i)); if(reset) banco.reset=false; res(); };
-      tx.onerror=tx.onabort=()=>rej(tx.error); }); }
+      puts.forEach(([k,v])=>st.put(v,k)); dels.forEach(k=>st.delete(k));
+      tx.oncomplete=()=>res(); tx.onerror=tx.onabort=()=>rej(tx.error); }); }
 };
+const contaMed = e => (e.elementos||[]).filter(x=>x.tipo==='cota').length + (e.fotos||[]).reduce((s,f)=>s+((f.elementos||[]).filter(x=>x.tipo==='cota').length),0);
+function atualizarIdx(){
+  const r={ id:regId, obra:estado.dados.obra||'', local:estado.dados.local||'', data:estado.dados.data||'', upd:Date.now(), nf:estado.fotos.length, nm:contaMed(estado) };
+  const i=indice.findIndex(x=>x.id===regId);
+  if(i>=0) indice[i]=r; else indice.unshift(r);
+}
+function gravar(){
+  const e=estado, N=[...banco.novas], A=[...banco.apagadas];
+  const meta=Object.assign({},e,{v:5,fotos:e.fotos.map(f=>({id:f.id,em:f.em,elementos:f.elementos||[]}))});
+  const puts=[['reg:'+regId,meta]];
+  N.forEach(id=>{ const f=e.fotos.find(x=>x.id===id); if(f) puts.push(['foto:'+id,f.data]); });
+  atualizarIdx(); puts.push(['idx',indice],['ultimo',regId]);
+  return banco.tx(puts,A.map(i=>'foto:'+i)).then(()=>{ N.forEach(i=>banco.novas.delete(i)); A.forEach(i=>banco.apagadas.delete(i)); });
+}
 let fila=Promise.resolve(), timerSalvar;
 function salvar(){
   $('saveStatus').textContent='salvando…';
-  fila=fila.then(()=>banco.gravar(estado))
+  fila=fila.then(gravar)
     .then(()=>{ $('saveStatus').textContent='salvo ✓'; })
     .catch(()=>{ $('saveStatus').textContent='erro ao salvar'; toast('⚠️ Não foi possível salvar (espaço?). Exporte um backup.'); });
   return fila;
 }
 function salvarDepois(){ clearTimeout(timerSalvar); timerSalvar=setTimeout(salvar,350); }
+async function carregarReg(id){
+  const m=await banco.get('reg:'+id); if(!m||!m.dados) return null;
+  const e=Object.assign(novoEstado(),m); e.dados=Object.assign(novoEstado().dados,m.dados);
+  e.elementos=Array.isArray(m.elementos)?m.elementos:[]; e.fotos=Array.isArray(m.fotos)?m.fotos:[];
+  await Promise.all(e.fotos.map(async f=>{ if(!f.data) f.data=await banco.get('foto:'+f.id); }));
+  e.fotos=e.fotos.filter(f=>f.data); e.fotos.forEach(f=>{ if(!f.elementos) f.elementos=[]; });
+  return e;
+}
+
+/* ---------- geometria: comprimentos isotrópicos (largura × proporção da superfície) ---------- */
+const U=(a,b,ar)=>Math.hypot((b.x-a.x)*ar,b.y-a.y);
+function escalaDe(els,ar){ /* mm por unidade — vem da ÚLTIMA referência (🎯) */
+  if(!isFinite(ar)||ar<=0) return null;
+  for(let i=els.length-1;i>=0;i--){ const e=els[i]; if(e.tipo==='ref'){ const u=U(e.a,e.b,ar); if(u>0) return parseFloat(e.mm)/u; } }
+  return null;
+}
+function areaU(p,ar){ let s=0; for(let i=0;i<p.length;i++){ const a=p[i], b=p[(i+1)%p.length]; s+=a.x*ar*b.y-b.x*ar*a.y; } return Math.abs(s)/2; }
+function perU(p,ar){ let s=0; for(let i=0;i<p.length;i++) s+=U(p[i],p[(i+1)%p.length],ar); return s; }
+function grausEm(a,v,b,ar){
+  const ux=(a.x-v.x)*ar,uy=a.y-v.y,wx=(b.x-v.x)*ar,wy=b.y-v.y, m=Math.hypot(ux,uy)*Math.hypot(wx,wy);
+  return m? Math.acos(Math.max(-1,Math.min(1,(ux*wx+uy*wy)/m)))*180/Math.PI : 0;
+}
+function itensMed(els,ar){
+  const m=escalaDe(els,ar), out=[]; let n=0,a=0,g=0;
+  for(const e of els){
+    if(e.tipo==='cota') out.push('M'+(++n)+' — '+(e.nome?e.nome+' — ':'')+fmtMM(e.mm)+' mm');
+    else if(e.tipo==='area'){ const t='A'+(++a)+' — '; out.push(m? t+fmtArea(areaU(e.pontos,ar)*m*m)+' · perímetro '+Math.round(perU(e.pontos,ar)*m)+' mm' : t+'sem escala'); }
+    else if(e.tipo==='ang') out.push('Ângulo '+(++g)+' — '+fmtDeg(e.deg));
+    else if(e.tipo==='ref') out.push('Referência de escala — '+fmtMM(e.mm)+' mm');
+  }
+  return out;
+}
 
 /* ---------- desenho (compartilhado por croqui, editor de foto e relatório) ----------
-   Elementos em coordenadas normalizadas (0–1). k = fator de escala de linhas e textos. */
-const AZUL='#0b57d0', TINTA='#111827';
-function desenhaEls(c,els,w,h,k){
+   Elementos em coordenadas normalizadas (0–1). k = fator de escala de linhas e textos.
+   esc = {ar, mmU} (proporção da superfície e mm por unidade) quando há escala calibrada. */
+const AZUL='#0b57d0', TINTA='#111827', VERDE='#16a34a';
+function etiqueta(c,txt,mx,my,k,cor){
+  c.font='600 '+(13*k)+'px system-ui,sans-serif';
+  const tw=c.measureText(txt).width;
+  c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(mx-tw/2-5*k,my-11*k,tw+10*k,20*k);
+  c.fillStyle=cor; c.textAlign='center'; c.textBaseline='middle';
+  c.fillText(txt,mx,my); c.textAlign='start'; c.textBaseline='alphabetic';
+}
+function desenhaEls(c,els,w,h,k,esc){
   const P=p=>({x:p.x*w,y:p.y*h});
   const seg=(a,b)=>{ c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); };
+  const ticks=(a,b,t)=>{ const ang=Math.atan2(b.y-a.y,b.x-a.x)+Math.PI/2;
+    for(const p of [a,b]) seg({x:p.x-Math.cos(ang)*t,y:p.y-Math.sin(ang)*t},{x:p.x+Math.cos(ang)*t,y:p.y+Math.sin(ang)*t});
+    return ang; };
   c.lineCap='round'; c.lineJoin='round'; c.setLineDash([]);
   for(const el of els){
     if(el.tipo==='cota'){
       const a=P(el.a), b=P(el.b);
       c.strokeStyle=AZUL; c.lineWidth=2*k; seg(a,b);
-      const ang=Math.atan2(b.y-a.y,b.x-a.x)+Math.PI/2, t=8*k;
-      for(const p of [a,b]) seg({x:p.x-Math.cos(ang)*t,y:p.y-Math.sin(ang)*t},{x:p.x+Math.cos(ang)*t,y:p.y+Math.sin(ang)*t});
-      const txt=(el.nome?el.nome+' · ':'')+fmtMM(el.mm)+' mm';
-      c.font='600 '+(13*k)+'px system-ui,sans-serif';
-      const tw=c.measureText(txt).width;
-      const mx=(a.x+b.x)/2+Math.cos(ang)*16*k, my=(a.y+b.y)/2+Math.sin(ang)*16*k;
-      c.fillStyle='rgba(255,255,255,.92)'; c.fillRect(mx-tw/2-5*k,my-11*k,tw+10*k,20*k);
-      c.fillStyle=AZUL; c.textAlign='center'; c.textBaseline='middle';
-      c.fillText(txt,mx,my); c.textAlign='start'; c.textBaseline='alphabetic';
+      const ang=ticks(a,b,8*k);
+      etiqueta(c,(el.nome?el.nome+' · ':'')+fmtMM(el.mm)+' mm',(a.x+b.x)/2+Math.cos(ang)*16*k,(a.y+b.y)/2+Math.sin(ang)*16*k,k,AZUL);
+    } else if(el.tipo==='ref'){
+      const a=P(el.a), b=P(el.b);
+      c.strokeStyle=VERDE; c.lineWidth=2*k; c.setLineDash([7*k,4*k]); seg(a,b); c.setLineDash([]);
+      const ang=ticks(a,b,8*k);
+      etiqueta(c,'REF · '+fmtMM(el.mm)+' mm',(a.x+b.x)/2+Math.cos(ang)*16*k,(a.y+b.y)/2+Math.sin(ang)*16*k,k,VERDE);
     } else if(el.tipo==='texto'){
       const p=P(el.p);
       c.font='600 '+(14*k)+'px system-ui,sans-serif';
@@ -368,10 +437,29 @@ function desenhaEls(c,els,w,h,k){
       const a=P(el.a), b=P(el.b);
       c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
       c.strokeRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y));
+      if(esc&&esc.mmU){ const lw=Math.abs(el.b.x-el.a.x)*esc.ar*esc.mmU, lh=Math.abs(el.b.y-el.a.y)*esc.mmU;
+        etiqueta(c,Math.round(lw)+' × '+Math.round(lh)+' mm · '+fmtArea(lw*lh),(a.x+b.x)/2,(a.y+b.y)/2,k*.9,el.cor||TINTA); }
     } else if(el.tipo==='circ'){
-      const a=P(el.a), b=P(el.b);
+      const a=P(el.a), b=P(el.b), r=Math.hypot(b.x-a.x,b.y-a.y);
       c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
-      c.beginPath(); c.arc(a.x,a.y,Math.hypot(b.x-a.x,b.y-a.y),0,Math.PI*2); c.stroke();
+      c.beginPath(); c.arc(a.x,a.y,r,0,Math.PI*2); c.stroke();
+      if(esc&&esc.mmU){ const rm=U(el.a,el.b,esc.ar)*esc.mmU;
+        etiqueta(c,'Ø '+Math.round(rm*2)+' mm · '+fmtArea(Math.PI*rm*rm),a.x,a.y,k*.9,el.cor||TINTA); }
+    } else if(el.tipo==='area'&&el.pontos&&el.pontos.length>2){
+      const ps=el.pontos.map(P);
+      c.beginPath(); ps.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y)); c.closePath();
+      c.fillStyle='rgba(11,87,208,.12)'; c.fill();
+      c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k; c.stroke();
+      const cx=ps.reduce((s,p)=>s+p.x,0)/ps.length, cy=ps.reduce((s,p)=>s+p.y,0)/ps.length;
+      const txt = esc&&esc.mmU ? fmtArea(areaU(el.pontos,esc.ar)*esc.mmU*esc.mmU)+' · P '+Math.round(perU(el.pontos,esc.ar)*esc.mmU)+' mm' : 'área (sem escala)';
+      etiqueta(c,txt,cx,cy,k*.9,AZUL);
+    } else if(el.tipo==='ang'){
+      const A=P(el.a), V=P(el.b), B=P(el.c);
+      c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k; seg(V,A); seg(V,B);
+      const ta=Math.atan2(A.y-V.y,A.x-V.x), tb=Math.atan2(B.y-V.y,B.x-V.x);
+      let d=tb-ta; while(d>Math.PI) d-=2*Math.PI; while(d<-Math.PI) d+=2*Math.PI;
+      c.strokeStyle=AZUL; c.lineWidth=2*k; c.beginPath(); c.arc(V.x,V.y,22*k,ta,ta+d,d<0); c.stroke();
+      etiqueta(c,fmtDeg(el.deg),V.x+Math.cos(ta+d/2)*44*k,V.y+Math.sin(ta+d/2)*44*k,k,AZUL);
     } else if(el.pontos&&el.pontos.length>1){
       c.strokeStyle=el.cor||TINTA; c.lineWidth=(el.esp||2.5)*k;
       c.beginPath(); const p0=P(el.pontos[0]); c.moveTo(p0.x,p0.y);
@@ -381,24 +469,26 @@ function desenhaEls(c,els,w,h,k){
   }
 }
 
-/* distância (px) de um ponto a um elemento — usada pela borracha */
+/* distância (px) de um ponto a um elemento — usada pela borracha e por mover */
 function distSeg(p,a,b,w,h){
   const px=p.x*w,py=p.y*h,ax=a.x*w,ay=a.y*h,dx=b.x*w-ax,dy=b.y*h-ay,l=dx*dx+dy*dy;
   let t=l?((px-ax)*dx+(py-ay)*dy)/l:0; t=Math.max(0,Math.min(1,t));
   return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
 }
 function distEl(el,p,w,h){
-  if(el.tipo==='cota'||el.tipo==='linha') return distSeg(p,el.a,el.b,w,h);
+  if(el.tipo==='cota'||el.tipo==='linha'||el.tipo==='ref') return distSeg(p,el.a,el.b,w,h);
+  if(el.tipo==='ang') return Math.min(distSeg(p,el.b,el.a,w,h),distSeg(p,el.b,el.c,w,h));
   if(el.tipo==='ret'){ const A=el.a,B=el.b,c1={x:B.x,y:A.y},c2={x:A.x,y:B.y};
     return Math.min(distSeg(p,A,c1,w,h),distSeg(p,c1,B,w,h),distSeg(p,B,c2,w,h),distSeg(p,c2,A,w,h)); }
   if(el.tipo==='circ') return Math.abs(Math.hypot((p.x-el.a.x)*w,(p.y-el.a.y)*h)-Math.hypot((el.b.x-el.a.x)*w,(el.b.y-el.a.y)*h));
   if(el.tipo==='texto'){ const L=(el.txt||'').length*8/w, y=el.p.y-5/h; return distSeg(p,{x:el.p.x,y},{x:el.p.x+L,y},w,h); }
-  if(el.pontos){ let m=1e9; for(let i=1;i<el.pontos.length;i++) m=Math.min(m,distSeg(p,el.pontos[i-1],el.pontos[i],w,h)); return m; }
+  if(el.pontos){ let m=1e9; const n=el.pontos.length, f=el.tipo==='area'?n:n-1;
+    for(let i=0;i<f;i++) m=Math.min(m,distSeg(p,el.pontos[i],el.pontos[(i+1)%n],w,h)); return m; }
   return 1e9;
 }
 
 /* ---------- catálogo de ferramentas ---------- */
-const FERR={medida:['📏','Medida (mm)'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],circ:['⭕','Círculo'],livre:['✏️','Livre'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha']};
+const FERR={medida:['📏','Medida (mm)'],calib:['🎯','Calibrar escala'],linha:['➖','Linha reta'],ret:['⬜','Retângulo'],circ:['⭕','Círculo'],livre:['✏️','Livre'],area:['▦','Área'],angulo:['∠','Ângulo'],texto:['🔤','Texto'],mover:['✋','Mover / editar'],borracha:['🧽','Borracha']};
 const CORES=['#111827','#0b57d0','#dc2626','#16a34a','#f59e0b','#7c3aed'];
 const ESPS=[1.5,2.5,4,6];
 function rotuloFerr(P){ const f=FERR[P.ferr]; P.btn.textContent='🛠️ '+f[0]+' '+f[1]; }
@@ -406,18 +496,21 @@ function rotuloFerr(P){ const f=FERR[P.ferr]; P.btn.textContent='🛠️ '+f[0]+
 /* ---------- "prancha": um canvas com as ferramentas (usada no croqui e na foto) ---------- */
 function aplicarMov(el,b,dx,dy){
   const mv=q=>({x:q.x+dx,y:q.y+dy});
-  if(b.a) el.a=mv(b.a); if(b.b) el.b=mv(b.b); if(b.p) el.p=mv(b.p);
+  if(b.a) el.a=mv(b.a); if(b.b) el.b=mv(b.b); if(b.c) el.c=mv(b.c); if(b.p) el.p=mv(b.p);
   if(b.pontos) el.pontos=b.pontos.map(mv);
 }
+const DRAG=['medida','calib','linha','ret','circ'];
 function criarPrancha(o){
   const cv=o.canvas, c=cv.getContext('2d'), lupa=o.lupa, lc=o.lupaCanvas.getContext('2d');
-  const P={ ferr:'medida', cor:TINTA, esp:2.5, orto:false, z:1, ox:0, oy:0, hist:[], refaz:[], btn:null, dpr:1, w:0, h:0, arr:null, sel:null };
+  const P={ ferr:'medida', cor:TINTA, esp:2.5, orto:false, z:1, ox:0, oy:0, hist:[], refaz:[], btn:null, dpr:1, w:0, h:0, arr:null, sel:null, seq:[] };
   const ptrs=new Map(); let gest=null;
   const lim=v=>Math.min(1,Math.max(0,v));
   const clone=x=>JSON.parse(JSON.stringify(x));
+  P.ar=()=>P.h?P.w/P.h:1;
+  P.escala=()=>escalaDe(o.els(),P.ar());
 
   /* histórico: add / del / mod (mover ou editar) */
-  P.zerar=()=>{ P.hist=[]; P.refaz=[]; };
+  P.zerar=()=>{ P.hist=[]; P.refaz=[]; P.seq=[]; };
   P.add=el=>{ o.els().push(el); P.hist.push({op:'add',el}); P.refaz=[]; salvarDepois(); };
   P.mod=(el,antes)=>{ P.hist.push({op:'mod',id:el.id,antes,depois:clone(el)}); P.refaz=[]; salvarDepois(); };
   P.trocar=(id,novo)=>{ const els=o.els(), i=els.findIndex(e=>e.id===id); if(i>=0) els[i]=clone(novo); };
@@ -428,6 +521,7 @@ function criarPrancha(o){
     const el=els.splice(best,1)[0]; P.hist.push({op:'del',el,i:best}); P.refaz=[]; salvarDepois();
   };
   P.desfazer=()=>{
+    if(P.seq.length){ P.seq.pop(); P.redesenhar(); return true; }
     const els=o.els(); let op=P.hist.pop();
     if(!op){ if(!els.length) return false; op={op:'add',el:els[els.length-1]}; }
     if(op.op==='add'){ const i=els.findIndex(e=>e.id===op.el.id); if(i>=0) els.splice(i,1); }
@@ -463,10 +557,16 @@ function criarPrancha(o){
     if(!P.w) return;
     c.setTransform(P.dpr*P.z,0,0,P.dpr*P.z,P.dpr*P.ox,P.dpr*P.oy);
     o.fundo(c,P.w,P.h);
-    desenhaEls(c,o.els(),P.w,P.h,1/P.z);
+    const els=o.els(), ar=P.ar();
+    desenhaEls(c,els,P.w,P.h,1/P.z,{ar,mmU:escalaDe(els,ar)});
+    if(P.seq.length){
+      c.save(); c.strokeStyle=AZUL; c.fillStyle=AZUL; c.lineWidth=2/P.z; c.setLineDash([6/P.z,5/P.z]); c.beginPath();
+      P.seq.forEach((q,i)=>{ const x=q.x*P.w,y=q.y*P.h; i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); c.setLineDash([]);
+      P.seq.forEach(q=>{ c.beginPath(); c.arc(q.x*P.w,q.y*P.h,4/P.z,0,7); c.fill(); }); c.restore();
+    }
     if(previa){
-      const m=previa.tipo==='medida', ax=previa.a.x*P.w, ay=previa.a.y*P.h, bx=previa.b.x*P.w, by=previa.b.y*P.h;
-      c.save(); c.setLineDash([6/P.z,5/P.z]); c.strokeStyle=m?AZUL:P.cor; c.lineWidth=(m?2:P.esp)/P.z; c.lineCap='round';
+      const m=previa.tipo==='medida'||previa.tipo==='calib', ax=previa.a.x*P.w, ay=previa.a.y*P.h, bx=previa.b.x*P.w, by=previa.b.y*P.h;
+      c.save(); c.setLineDash([6/P.z,5/P.z]); c.strokeStyle=previa.tipo==='calib'?VERDE:(m?AZUL:P.cor); c.lineWidth=(m?2:P.esp)/P.z; c.lineCap='round';
       if(previa.tipo==='ret') c.strokeRect(Math.min(ax,bx),Math.min(ay,by),Math.abs(bx-ax),Math.abs(by-ay));
       else if(previa.tipo==='circ'){ c.beginPath(); c.arc(ax,ay,Math.hypot(bx-ax,by-ay),0,Math.PI*2); c.stroke(); }
       else { c.beginPath(); c.moveTo(ax,ay); c.lineTo(bx,by); c.stroke(); }
@@ -494,7 +594,7 @@ function criarPrancha(o){
     lupa.style.left=lx+'px'; lupa.style.top=ly+'px';
   };
   const snap=(ini,p)=>{
-    if(!P.orto||(P.ferr!=='medida'&&P.ferr!=='linha')) return p;
+    if(!P.orto||(P.ferr!=='medida'&&P.ferr!=='linha'&&P.ferr!=='calib')) return p;
     return Math.abs((p.x-ini.x)*P.w)>=Math.abs((p.y-ini.y)*P.h) ? {x:p.x,y:ini.y} : {x:ini.x,y:p.y};
   };
   const achar=p=>{
@@ -551,8 +651,10 @@ function criarPrancha(o){
       c.beginPath(); c.moveTo(P.arr.pontos[0].x*P.w,P.arr.pontos[0].y*P.h);
       for(const q of P.arr.pontos) c.lineTo(q.x*P.w,q.y*P.h);
       c.stroke();
-    } else if(P.ferr==='medida'||P.ferr==='linha'||P.ferr==='ret'||P.ferr==='circ'){
+    } else if(DRAG.includes(P.ferr)){
       P.redesenhar({tipo:P.ferr,a:P.arr.ini,b:P.arr.atual});
+    } else if((P.ferr==='angulo'||P.ferr==='area')&&P.seq.length){
+      P.redesenhar({tipo:'linha',a:P.seq[P.seq.length-1],b:P.arr.atual});
     } else if(P.ferr==='mover'&&P.sel){
       aplicarMov(P.sel.el,P.sel.base,P.arr.atual.x-P.arr.ini.x,P.arr.atual.y-P.arr.ini.y);
       P.redesenhar();
@@ -566,13 +668,30 @@ function criarPrancha(o){
     P.arr=null; P.sel=null;
     const dist=Math.hypot((b.x-a.x)*P.w,(b.y-a.y)*P.h);
     const longe=dist>10/P.z;
-    if(P.ferr==='medida'){
-      if(longe) pedirValor('medida',{a,b},P); else P.redesenhar();
+    if(P.ferr==='medida'||P.ferr==='calib'){
+      if(!longe) P.redesenhar();
+      else if(P.ferr==='calib') pedirValor('calib',{a,b},P);
+      else { const m=P.escala(); pedirValor('medida',{a,b},P,m?Math.round(U(a,b,P.ar())*m):null); }
     } else if(P.ferr==='linha'||P.ferr==='ret'||P.ferr==='circ'){
       if(longe) P.add({id:uid(),tipo:P.ferr,a,b,cor:P.cor,esp:P.esp});
       P.redesenhar();
     } else if(P.ferr==='livre'){
       if(pts.length>1) P.add({id:uid(),tipo:'livre',pontos:pts,cor:P.cor,esp:P.esp});
+      P.redesenhar();
+    } else if(P.ferr==='angulo'){
+      P.seq.push(b);
+      if(P.seq.length===3){
+        const [p1,v,p2]=P.seq; P.seq=[];
+        P.add({id:uid(),tipo:'ang',a:p1,b:v,c:p2,deg:grausEm(p1,v,p2,P.ar()),cor:P.cor,esp:P.esp});
+      } else toast(P.seq.length===1?'Agora toque o vértice (o canto do ângulo).':'Toque a outra ponta.');
+      P.redesenhar();
+    } else if(P.ferr==='area'){
+      const fechar=P.seq.length>=3 && Math.hypot((b.x-P.seq[0].x)*P.w,(b.y-P.seq[0].y)*P.h)<24/P.z;
+      if(fechar){
+        const ps=P.seq; P.seq=[];
+        P.add({id:uid(),tipo:'area',pontos:ps,cor:P.cor,esp:P.esp});
+        if(!P.escala()) toast('Área criada. Calibre a escala (🎯) para ver m².');
+      } else { P.seq.push(b); if(P.seq.length===1) toast('Toque os cantos e feche tocando no 1º ponto.'); }
       P.redesenhar();
     } else if(P.ferr==='texto'){
       pedirValor('texto',{p:a},P); P.redesenhar();
@@ -582,6 +701,7 @@ function criarPrancha(o){
       if(!sel){ P.redesenhar(); return; }
       if(dist>6/P.z){ P.mod(sel.el,sel.base); P.redesenhar(); }
       else if(sel.el.tipo==='cota') pedirValor('editarMedida',{el:sel.el},P,sel.el.mm,sel.el.nome);
+      else if(sel.el.tipo==='ref') pedirValor('editarCalib',{el:sel.el},P,sel.el.mm);
       else if(sel.el.tipo==='texto') pedirValor('editarTexto',{el:sel.el},P,sel.el.txt);
       else P.redesenhar();
     }
@@ -626,15 +746,17 @@ function ajustarPalco(){
   const livre=window.innerHeight-docTop-dicaH-10-baixo;
   palco.style.height=Math.max(200,Math.floor(livre))+'px';
 }
-function ajustarCroqui(){ ajustarPalco(); pCroqui.ajustar(); }
+function ajustarCroqui(){ ajustarPalco(); pCroqui.ajustar(); if(pCroqui.w>10&&pCroqui.h>10) estado.ar=pCroqui.w/pCroqui.h; }
 
 /* ---------- abas ---------- */
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('ativo',x===b));
-  document.querySelectorAll('main>section').forEach(s=>s.hidden=(s.id!=='tab-'+b.dataset.tab));
-  if(b.dataset.tab==='croqui') requestAnimationFrame(ajustarCroqui);
-  if(b.dataset.tab==='relatorio') atualizarResumo();
-}));
+function irAba(nome){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('ativo',x.dataset.tab===nome));
+  document.querySelectorAll('main>section').forEach(s=>s.hidden=(s.id!=='tab-'+nome));
+  if(nome==='croqui') requestAnimationFrame(ajustarCroqui);
+  if(nome==='relatorio') atualizarResumo();
+  if(nome==='registros') renderLista();
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>irAba(b.dataset.tab)));
 
 /* ---------- modal de ferramentas ---------- */
 let pAlvo=null;
@@ -650,12 +772,16 @@ function marcarFerr(){
   document.querySelectorAll('#gEsps [data-esp]').forEach(b=>b.classList.toggle('ativo',parseFloat(b.dataset.esp)===pAlvo.esp));
   $('btnOrto').classList.toggle('ativo',!!pAlvo.orto);
   $('btnZoom1').textContent='🔍 Zoom 1× (agora '+pAlvo.z.toFixed(1).replace('.',',')+'×)';
+  $('escInfo').textContent = pAlvo.escala() ? '🎯 Escala calibrada — medidas, retângulos, círculos e áreas saem em mm.' : '🎯 Sem escala — use Calibrar sobre algo de medida conhecida.';
 }
 function abrirFerr(P){ pAlvo=P; marcarFerr(); $('modalFerr').hidden=false; }
 function fecharFerr(){ $('modalFerr').hidden=true; pAlvo=null; }
 $('gFer').addEventListener('click',e=>{
   const b=e.target.closest('[data-pick]'); if(!b||!pAlvo) return;
-  pAlvo.ferr=b.dataset.pick; rotuloFerr(pAlvo); fecharFerr();
+  pAlvo.seq=[]; pAlvo.ferr=b.dataset.pick; rotuloFerr(pAlvo); const P=pAlvo; fecharFerr(); P.redesenhar();
+  if(P.ferr==='calib') toast('Arraste sobre algo de medida conhecida.');
+  if(P.ferr==='area') toast('Toque os cantos; feche tocando no 1º ponto.');
+  if(P.ferr==='angulo') toast('Toque uma ponta, o vértice e a outra ponta.');
 });
 $('gCores').addEventListener('click',e=>{
   const b=e.target.closest('[data-cor]'); if(!b||!pAlvo) return;
@@ -681,14 +807,17 @@ $('btnLimpar').addEventListener('click',()=>{
 
 /* ---------- modal medir/texto — medida SEMPRE digitada em mm ---------- */
 let pedido=null;
+const NUM=['medida','editarMedida','calib','editarCalib'];
 function pedirValor(tipo,geom,alvo,valor,nome){
   pedido={tipo,geom,alvo};
-  const med=(tipo==='medida'||tipo==='editarMedida');
-  $('mvTitulo').textContent = {medida:'Digite a medida (mm)',editarMedida:'Editar medida (mm)',texto:'Digite o texto',editarTexto:'Editar texto'}[tipo];
+  const med=NUM.includes(tipo);
+  $('mvTitulo').textContent = tipo==='medida'&&valor!=null ? 'Medida (mm) · sugerida pela escala'
+    : {medida:'Digite a medida (mm)',editarMedida:'Editar medida (mm)',calib:'Comprimento real deste trecho (mm)',editarCalib:'Editar referência (mm)',texto:'Digite o texto',editarTexto:'Editar texto'}[tipo];
   const c=$('mvCampo');
   c.value = valor!=null ? (med?String(valor).replace('.',','):valor) : '';
   c.setAttribute('inputmode', med ? 'decimal' : 'text');
-  $('mvNome').hidden=!med; $('mvNome').value=nome||'';
+  const comNome=(tipo==='medida'||tipo==='editarMedida');
+  $('mvNome').hidden=!comNome; $('mvNome').value=nome||'';
   $('modalValor').hidden=false;
   setTimeout(()=>{ c.focus(); if(valor!=null) c.select(); },60);
 }
@@ -699,18 +828,23 @@ function confirmarValor(){
   if(!v){ toast('Digite um valor.'); return; }
   const alvo=pedido.alvo, t=pedido.tipo, nome=$('mvNome').value.trim();
   let n=null;
-  if(t==='medida'||t==='editarMedida'){
+  if(NUM.includes(t)){
     n=v.replace(',','.');
     if(!/^\d+(\.\d+)?$/.test(n)||parseFloat(n)<=0){ toast('Medida inválida — use apenas números (mm).'); return; }
   }
   if(t==='medida'){
     const el={id:uid(),tipo:'cota',a:pedido.geom.a,b:pedido.geom.b,mm:n}; if(nome) el.nome=nome;
     alvo.add(el);
+  } else if(t==='calib'){
+    alvo.add({id:uid(),tipo:'ref',a:pedido.geom.a,b:pedido.geom.b,mm:n});
+    toast('Escala calibrada. Agora as medidas vêm sugeridas.');
   } else if(t==='texto'){
     alvo.add({id:uid(),tipo:'texto',p:pedido.geom.p,txt:v,cor:alvo.cor});
   } else {
     const el=pedido.geom.el, antes=JSON.parse(JSON.stringify(el));
-    if(t==='editarMedida'){ el.mm=n; if(nome) el.nome=nome; else delete el.nome; } else el.txt=v;
+    if(t==='editarMedida'){ el.mm=n; if(nome) el.nome=nome; else delete el.nome; }
+    else if(t==='editarCalib') el.mm=n;
+    else el.txt=v;
     alvo.mod(el,antes);
   }
   fecharValor(); alvo.redesenhar();
@@ -871,66 +1005,238 @@ $('btnCapturar').addEventListener('click',()=>{
 /* ---------- dados ---------- */
 const campos={dObra:'obra',dLocal:'local',dTecnico:'tecnico',dData:'data',dObs:'obs'};
 for(const [id,k] of Object.entries(campos)){
-  $(id).addEventListener('input',e=>{ estado.dados[k]=e.target.value; salvarDepois(); });
+  $(id).addEventListener('input',e=>{ estado.dados[k]=e.target.value; if(k==='obra') atualizarMarca(); salvarDepois(); });
 }
 function pintaDados(){ for(const [id,k] of Object.entries(campos)) $(id).value=estado.dados[k]||''; }
-$('btnNovo').addEventListener('click',()=>{
-  if(confirm('Começar um novo registro? O atual (croqui, fotos e dados) será apagado deste aparelho. Exporte um backup antes, se precisar.')){
-    estado=novoEstado(); banco.reset=true; pCroqui.zerar(); pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Novo registro criado.');
-  }
-});
+function atualizarMarca(){ $('subMarca').textContent=estado.dados.obra||'registro técnico de campo'; }
 
-/* ---------- relatório ---------- */
+/* ---------- registros (várias obras) ---------- */
+function aplicarEstado(){
+  pCroqui.zerar(); pCroqui.z=1; pCroqui.ox=0; pCroqui.oy=0;
+  pintaDados(); renderFotos(); atualizarMarca(); renderLista();
+  if(!$('tab-croqui').hidden) ajustarCroqui(); else pCroqui.redesenhar();
+}
+async function abrirReg(id,semSalvar){
+  if(!semSalvar) await salvar();
+  const e=await carregarReg(id);
+  if(!e){ toast('Registro não encontrado.'); return false; }
+  estado=e; regId=id; banco.novas.clear(); banco.apagadas.clear();
+  banco.tx([['ultimo',id]],[]).catch(()=>{});
+  aplicarEstado(); return true;
+}
+async function novoReg(){
+  await salvar();
+  estado=novoEstado(); regId=uid(); banco.novas.clear(); banco.apagadas.clear();
+  await salvar(); aplicarEstado(); irAba('dados'); toast('Novo registro criado. Preencha os dados.');
+}
+async function duplicarReg(id){
+  await salvar();
+  const e=await carregarReg(id); if(!e) return;
+  const novo=uid(); e.fotos.forEach(f=>{ f.id=uid(); });
+  e.dados.obra=(e.dados.obra||'Sem nome')+' (cópia)';
+  const puts=[['reg:'+novo,Object.assign({},e,{v:5,fotos:e.fotos.map(f=>({id:f.id,em:f.em,elementos:f.elementos||[]}))})]];
+  e.fotos.forEach(f=>puts.push(['foto:'+f.id,f.data]));
+  indice.unshift({id:novo,obra:e.dados.obra,local:e.dados.local||'',data:e.dados.data||'',upd:Date.now(),nf:e.fotos.length,nm:contaMed(e)});
+  puts.push(['idx',indice]);
+  try{ await banco.tx(puts,[]); renderLista(); toast('Registro duplicado.'); }
+  catch(err){ indice=indice.filter(r=>r.id!==novo); toast('⚠️ Não foi possível duplicar (espaço?).'); }
+}
+async function excluirReg(id){
+  const r=indice.find(x=>x.id===id); if(!r) return;
+  if(!confirm('Excluir "'+(r.obra||'Sem nome')+'" com todas as fotos e desenhos? Não dá para desfazer.')) return;
+  await fila;
+  const meta=await banco.get('reg:'+id);
+  const dels=['reg:'+id].concat(((meta&&meta.fotos)||[]).map(f=>'foto:'+f.id));
+  indice=indice.filter(x=>x.id!==id);
+  try{ await banco.tx([['idx',indice]],dels); }catch(e){ toast('⚠️ Não foi possível excluir.'); return; }
+  if(id===regId){
+    const prox=[...indice].sort((a,b)=>(b.upd||0)-(a.upd||0))[0];
+    if(!(prox&&await abrirReg(prox.id,true))){
+      estado=novoEstado(); regId=uid(); banco.novas.clear(); banco.apagadas.clear(); await salvar(); aplicarEstado();
+    }
+  } else renderLista();
+  toast('Registro excluído.');
+}
+function renderLista(){
+  const box=$('listaReg'), q=($('busca').value||'').trim().toLowerCase();
+  const itens=[...indice].sort((a,b)=>(b.upd||0)-(a.upd||0)).filter(r=>!q||((r.obra||'')+' '+(r.local||'')).toLowerCase().includes(q));
+  box.innerHTML='';
+  if(!itens.length){ const p=document.createElement('p'); p.className='dica'; p.textContent=q?'Nenhum registro encontrado.':'Nenhum registro ainda.'; box.appendChild(p); return; }
+  itens.forEach(r=>{
+    const el=document.createElement('div'); el.className='reg'+(r.id===regId?' atual':''); el.dataset.id=r.id;
+    const info=document.createElement('div'); info.className='regInfo';
+    const t=document.createElement('b'); t.textContent=(r.id===regId?'● ':'')+(r.obra||'Sem nome');
+    const s=document.createElement('span'); s.textContent=[r.local,fmtData(r.data),(r.nf||0)+' foto(s)',(r.nm||0)+' medida(s)'].filter(Boolean).join(' · ');
+    info.append(t,s);
+    const ac=document.createElement('div'); ac.className='regAc';
+    [['abrir',r.id===regId?'✏️ Continuar':'📂 Abrir','destaque'],['dup','📑 Duplicar',''],['exc','🗑️ Excluir','perigo']].forEach(([a,txt,cl])=>{
+      const b=document.createElement('button'); b.className='fer '+cl; b.dataset.acao=a; b.textContent=txt; ac.appendChild(b);
+    });
+    el.append(info,ac); box.appendChild(el);
+  });
+}
+$('listaReg').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-acao]'); if(!b) return;
+  const id=b.closest('.reg').dataset.id;
+  if(b.dataset.acao==='abrir'){ if(id===regId||await abrirReg(id)) irAba('croqui'); }
+  else if(b.dataset.acao==='dup') duplicarReg(id);
+  else excluirReg(id);
+});
+$('busca').addEventListener('input',renderLista);
+$('btnNovoReg').addEventListener('click',novoReg);
+$('btnImportarReg').addEventListener('click',()=>$('inpBackup').click());
+
+/* ---------- relatório: PDF em A4 (dados + croqui + medidas na 1ª folha; depois as fotos) ---------- */
 function atualizarResumo(){
-  const m=estado.elementos.filter(e=>e.tipo==='cota').length;
+  const n=t=>estado.elementos.filter(e=>e.tipo===t).length;
   const mf=estado.fotos.reduce((s,f)=>s+((f.elementos||[]).filter(e=>e.tipo==='cota').length),0);
-  $('resumo').textContent='Este registro: '+m+' medida(s) no croqui'+(mf?' + '+mf+' nas fotos':'')+' (mm) · '+estado.fotos.length+' foto(s) · croqui com '+estado.elementos.length+' elemento(s).';
+  $('resumo').textContent='Este registro: '+n('cota')+' medida(s) no croqui'+(mf?' + '+mf+' nas fotos':'')+' (mm) · '+n('area')+' área(s) · '+n('ang')+' ângulo(s) · '+estado.fotos.length+' foto(s).';
 }
 function carregarImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
-async function fotoParaRelatorio(f){
-  if(!f.elementos||!f.elementos.length) return f.data;
-  try{
-    const im=await carregarImg(f.data);
-    const W=Math.min(im.naturalWidth,1600), H=Math.round(W*im.naturalHeight/im.naturalWidth);
-    const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-    const c=cv.getContext('2d'); c.drawImage(im,0,0,W,H);
-    desenhaEls(c,f.elementos,W,H,W/420);
-    return cv.toDataURL('image/jpeg',.85);
-  }catch(e){ return f.data; }
+const PW=595.28, PH=841.89, PS=3, PM=36;
+const fonte=(c,f,b)=>{ c.font=(b?'700 ':'400 ')+f+'px Arial,Helvetica,sans-serif'; };
+function txt(c,s,x,y,o={}){ fonte(c,o.f||10,o.b); c.fillStyle=o.cor||'#111827'; c.textAlign=o.al||'left'; c.fillText(s,x,y); c.textAlign='left'; }
+function quebra(c,s,mw,f,b){
+  fonte(c,f,b); const out=[];
+  String(s||'').split('\n').forEach(par=>{ let l=''; par.split(/\s+/).forEach(w=>{ const t=l?l+' '+w:w; if(c.measureText(t).width>mw&&l){ out.push(l); l=w; } else l=t; }); out.push(l); });
+  return out;
 }
+async function montarPaginas(){
+  const d=estado.dados, els=estado.elementos, ar=estado.ar||1, fotos=estado.fotos, pags=[];
+  const nova=()=>{ const cv=document.createElement('canvas'); cv.width=Math.round(PW*PS); cv.height=Math.round(PH*PS); const c=cv.getContext('2d'); c.scale(PS,PS); c.fillStyle='#fff'; c.fillRect(0,0,PW,PH); pags.push(cv); return c; };
+  let c=nova();
+  /* cabeçalho + dados */
+  txt(c,'METRIA',PM,PM+16,{f:22,b:1}); txt(c,'Registro técnico de campo',PM,PM+30,{f:9,cor:'#475569'}); txt(c,fmtData(d.data),PW-PM,PM+16,{f:11,al:'right'});
+  c.fillStyle='#0f172a'; c.fillRect(PM,PM+38,PW-2*PM,1.4);
+  let y=PM+56; const cw=(PW-2*PM)/2;
+  [['Obra / Cliente',d.obra],['Local',d.local],['Técnico responsável',d.tecnico],['Data',fmtData(d.data)]].forEach((cel,i)=>{
+    const x=PM+(i%2)*cw, yy=y+Math.floor(i/2)*40;
+    txt(c,cel[0],x,yy,{f:8,cor:'#64748b'});
+    quebra(c,cel[1]||'—',cw-12,11,0).slice(0,2).forEach((l,j)=>txt(c,l,x,yy+13+j*13,{f:11}));
+  });
+  y+=94;
+  /* croqui (esquerda) + medidas (direita) — na mesma folha dos dados */
+  if(els.length){
+    const BW=330, BH=300; let w=BW, h=BW/ar; if(h>BH){ h=BH; w=BH*ar; }
+    const top=y+8, lx=PM+BW+14, lw=PW-PM-lx;
+    txt(c,'Croqui',PM,y,{f:11,b:1}); txt(c,'Medidas',lx,y,{f:11,b:1});
+    c.save(); c.translate(PM,top); c.beginPath(); c.rect(0,0,w,h); c.clip();
+    c.fillStyle='#fff'; c.fillRect(0,0,w,h);
+    c.strokeStyle='#eef2f7'; c.lineWidth=.5; c.beginPath();
+    for(let gx=20;gx<w;gx+=20){ c.moveTo(gx,0); c.lineTo(gx,h); }
+    for(let gy=20;gy<h;gy+=20){ c.moveTo(0,gy); c.lineTo(w,gy); }
+    c.stroke();
+    desenhaEls(c,els,w,h,w/380,{ar,mmU:escalaDe(els,ar)});
+    c.restore(); c.strokeStyle='#94a3b8'; c.lineWidth=.8; c.strokeRect(PM,top,w,h);
+    let ly=y+16; const rest=[];
+    itensMed(els,ar).forEach(it=>{
+      const ls=quebra(c,it,lw,9.5,0);
+      if(ly+ls.length*12>top+h) rest.push(it);
+      else ls.forEach(l=>{ txt(c,l,lx,ly+8,{f:9.5}); ly+=12; });
+    });
+    y=top+h+18;
+    if(rest.length){
+      txt(c,'Medidas (continuação)',PM,y,{f:10,b:1}); y+=14;
+      rest.forEach(it=>quebra(c,it,PW-2*PM,9.5,0).forEach(l=>{ if(y>PH-PM-70){ c=nova(); y=PM+10; } txt(c,l,PM,y,{f:9.5}); y+=12; }));
+      y+=8;
+    }
+  }
+  /* observações (quebra de página se for longa) */
+  if(d.obs){
+    if(y>PH-PM-90){ c=nova(); y=PM+10; }
+    txt(c,'Observações',PM,y,{f:11,b:1}); y+=15;
+    quebra(c,d.obs,PW-2*PM,10,0).forEach(l=>{ if(y>PH-PM-70){ c=nova(); y=PM+10; } txt(c,l,PM,y,{f:10}); y+=12.5; });
+  }
+  /* fotos: 4 por folha, com o desenho por cima */
+  const gw=(PW-2*PM-14)/2, gh=(PH-2*PM-84-14)/2;
+  for(let i=0;i<fotos.length;i++){
+    if(i%4===0){ c=nova(); txt(c,'Fotos ('+fotos.length+')',PM,PM+12,{f:12,b:1}); }
+    const f=fotos[i], fe=f.elementos||[], x=PM+(i%2)*(gw+14), y0=PM+24+Math.floor((i%4)/2)*(gh+14);
+    let im=null; try{ im=await carregarImg(f.data); }catch(e){}
+    let dh=0;
+    if(im){
+      const iw=im.naturalWidth, ih=im.naturalHeight, s=Math.min(gw/iw,(gh-36)/ih), dw=iw*s; dh=ih*s;
+      const dx=x+(gw-dw)/2;
+      c.drawImage(im,dx,y0,dw,dh);
+      c.save(); c.translate(dx,y0); c.beginPath(); c.rect(0,0,dw,dh); c.clip();
+      desenhaEls(c,fe,dw,dh,dw/380,{ar:iw/ih,mmU:escalaDe(fe,iw/ih)});
+      c.restore(); c.strokeStyle='#94a3b8'; c.lineWidth=.8; c.strokeRect(dx,y0,dw,dh);
+      txt(c,'Foto '+(i+1),x,y0+dh+12,{f:9,b:1});
+      quebra(c,itensMed(fe,iw/ih).join(' · '),gw,8.5,0).slice(0,2).forEach((l,j)=>txt(c,l,x,y0+dh+23+j*11,{f:8.5,cor:'#334155'}));
+    } else txt(c,'Foto '+(i+1)+' — não foi possível ler a imagem',x,y0+12,{f:9,cor:'#b91c1c'});
+  }
+  /* assinatura (última folha) e rodapé */
+  c.fillStyle='#000'; c.fillRect(PW/2-110,PH-PM-34,220,.8);
+  txt(c,'Técnico responsável'+(d.tecnico?' — '+d.tecnico:''),PW/2,PH-PM-22,{f:9,al:'center'});
+  const agora=new Date().toLocaleString('pt-BR');
+  pags.forEach((cv,i)=>{ const cc=cv.getContext('2d');
+    txt(cc,'Gerado pelo METRIA em '+agora,PM,PH-PM+4,{f:7.5,cor:'#64748b'});
+    txt(cc,'Pág. '+(i+1)+'/'+pags.length,PW-PM,PH-PM+4,{f:7.5,cor:'#64748b',al:'right'}); });
+  return pags;
+}
+/* gera o PDF (páginas JPEG embutidas) sem nenhuma biblioteca externa */
+function montarPDF(imgs){
+  const enc=new TextEncoder(), partes=[], offs=[]; let len=0;
+  const add=x=>{ const b=typeof x==='string'?enc.encode(x):x; partes.push(b); len+=b.length; };
+  const obj=(n,fn)=>{ offs[n]=len; add(n+' 0 obj\n'); fn(); add('\nendobj\n'); };
+  const N=imgs.length;
+  add('%PDF-1.4\n');
+  obj(1,()=>add('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2,()=>add('<< /Type /Pages /Count '+N+' /Kids ['+imgs.map((_,i)=>(3+3*i)+' 0 R').join(' ')+'] >>'));
+  imgs.forEach((im,i)=>{
+    const p=3+3*i, cs='q '+PW+' 0 0 '+PH+' 0 0 cm /Im0 Do Q';
+    obj(p,()=>add('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+PW+' '+PH+'] /Resources << /XObject << /Im0 '+(p+2)+' 0 R >> >> /Contents '+(p+1)+' 0 R >>'));
+    obj(p+1,()=>add('<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream'));
+    obj(p+2,()=>{ add('<< /Type /XObject /Subtype /Image /Width '+im.w+' /Height '+im.h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+im.bytes.length+' >>\nstream\n'); add(im.bytes); add('\nendstream'); });
+  });
+  const total=3+3*N, xr=len;
+  add('xref\n0 '+total+'\n0000000000 65535 f \n');
+  for(let n=1;n<total;n++) add(String(offs[n]).padStart(10,'0')+' 00000 n \n');
+  add('trailer\n<< /Size '+total+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+  return new Blob(partes,{type:'application/pdf'});
+}
+let relPdf=null;
 async function gerarRelatorio(){
-  pCroqui.redesenhar();
-  const d=estado.dados;
-  const cotas=estado.elementos.filter(e=>e.tipo==='cota');
-  const sv={z:pCroqui.z,ox:pCroqui.ox,oy:pCroqui.oy};
-  Object.assign(pCroqui,{z:1,ox:0,oy:0}); pCroqui.redesenhar();
-  const img=$('tela').toDataURL('image/png');
-  Object.assign(pCroqui,sv); pCroqui.redesenhar();
-  const linhas=cotas.map((c,i)=>'<li><b>M'+(i+1)+'</b> — '+(c.nome?esc(c.nome)+' — ':'')+esc(fmtMM(c.mm))+' mm</li>').join('')||'<li>Nenhuma medida lançada.</li>';
-  const srcs=await Promise.all(estado.fotos.map(fotoParaRelatorio));
-  const fotos=estado.fotos.map((f,i)=>{
-    const med=(f.elementos||[]).filter(e=>e.tipo==='cota').map(c=>(c.nome?c.nome+' ':'')+fmtMM(c.mm)+' mm');
-    return '<figure class="rfoto"><img src="'+srcs[i]+'"><figcaption>Foto '+(i+1)+(med.length?' — '+esc(med.join(' · ')):'')+'</figcaption></figure>';
-  }).join('');
-  $('relatorio').innerHTML =
-    '<header class="rCab"><div><h1>METRIA</h1><p>Registro técnico de campo</p></div><div>'+esc(d.data||'')+'</div></header>'+
-    '<table class="rTab"><tr><th>Obra / Cliente</th><td>'+esc(d.obra||'—')+'</td></tr><tr><th>Local</th><td>'+esc(d.local||'—')+'</td></tr><tr><th>Técnico</th><td>'+esc(d.tecnico||'—')+'</td></tr></table>'+
-    (estado.elementos.length?'<h2>Croqui</h2><img class="rCroqui" src="'+img+'">':'')+
-    (cotas.length?'<h2>Medidas (mm)</h2><ul class="rMed">'+linhas+'</ul>':'')+
-    (d.obs?'<h2>Observações</h2><p class="rObs">'+esc(d.obs)+'</p>':'')+
-    (fotos?'<h2>Fotos ('+estado.fotos.length+')</h2><div class="rFotos">'+fotos+'</div>':'')+
-    '<div class="rAssin"><span></span>Técnico responsável</div>'+
-    '<footer class="rPe">Gerado pelo METRIA em '+new Date().toLocaleString('pt-BR')+'</footer>';
-  document.title='METRIA - '+(d.obra||'registro')+(d.data?' - '+d.data:'');
-  setTimeout(()=>window.print(),80);
+  const btn=$('btnGerar'); btn.disabled=true; toast('Gerando relatório…');
+  try{
+    if(!$('tab-croqui').hidden) ajustarCroqui();
+    const pags=await montarPaginas();
+    const urls=pags.map(cv=>cv.toDataURL('image/jpeg',.88));
+    const imgs=urls.map((u,i)=>({ bytes:Uint8Array.from(atob(u.split(',')[1]),ch=>ch.charCodeAt(0)), w:pags[i].width, h:pags[i].height }));
+    const blob=montarPDF(imgs), d=estado.dados;
+    const nome=('METRIA - '+(d.obra||'registro')+(d.data?' - '+d.data:'')).replace(/[\\/:*?"<>|]+/g,' ').trim()+'.pdf';
+    relPdf={blob,nome,urls,file:new File([blob],nome,{type:'application/pdf'})};
+    $('prevInfo').textContent=pags.length+' página(s) · '+(blob.size/1048576).toFixed(1).replace('.',',')+' MB';
+    const corpo=$('prevCorpo'); corpo.innerHTML='';
+    urls.forEach((u,i)=>{ const im=document.createElement('img'); im.src=u; im.alt='Página '+(i+1); corpo.appendChild(im); });
+    corpo.scrollTop=0;
+    $('prevCompart').hidden=!(navigator.canShare&&navigator.canShare({files:[relPdf.file]}));
+    $('modalPrev').hidden=false; $('toast').hidden=true;
+  }catch(e){ toast('Não foi possível gerar o relatório.'); }
+  btn.disabled=false;
 }
 $('btnGerar').addEventListener('click',gerarRelatorio);
-window.addEventListener('afterprint',()=>{ document.title='METRIA — Registro Técnico de Campo'; });
+$('prevFechar').addEventListener('click',()=>{ $('modalPrev').hidden=true; $('prevCorpo').innerHTML=''; relPdf=null; $('relatorio').innerHTML=''; });
+$('prevBaixar').addEventListener('click',()=>{
+  if(!relPdf) return;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(relPdf.blob); a.download=relPdf.nome; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast('PDF baixado.');
+});
+$('prevCompart').addEventListener('click',async()=>{
+  if(!relPdf) return;
+  try{ await navigator.share({files:[relPdf.file],title:relPdf.nome}); }
+  catch(e){ if(e.name!=='AbortError') toast('Não foi possível compartilhar. Use Baixar PDF.'); }
+});
+$('prevImprimir').addEventListener('click',()=>{
+  if(!relPdf) return;
+  $('relatorio').innerHTML=''; relPdf.urls.forEach(u=>{ const im=document.createElement('img'); im.src=u; $('relatorio').appendChild(im); });
+  setTimeout(()=>window.print(),120);
+});
 
-/* ---------- backup ---------- */
+/* ---------- backup: exportar / importar (com validação rigorosa) ---------- */
 let arqExport=null;
 $('btnExportar').addEventListener('click',()=>{
-  const nome='metria-'+(estado.dados.data||'registro')+'.json';
+  const nome='metria-'+((estado.dados.obra||'registro').replace(/[^\w\-]+/g,'_').slice(0,30))+'-'+(estado.dados.data||'')+'.json';
   arqExport=new File([JSON.stringify(estado)],nome,{type:'application/json'});
   $('expInfo').textContent=nome+' · '+(arqExport.size/1048576).toFixed(1).replace('.',',')+' MB';
   $('btnCompartilhar').hidden=!(navigator.canShare&&navigator.canShare({files:[arqExport]}));
@@ -949,29 +1255,88 @@ $('btnCompartilhar').addEventListener('click',async()=>{
 });
 $('expFechar').addEventListener('click',()=>{ $('modalExport').hidden=true; arqExport=null; });
 $('btnImportar').addEventListener('click',()=>$('inpBackup').click());
+
+/* sanitização: só entra o que tem formato conhecido; ids novos; fotos só se forem imagens reais */
+const COR_OK=/^#[0-9a-fA-F]{6}$/, IMG_OK=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/]+=*$/;
+const TIPOS_OK=['cota','texto','linha','ret','circ','livre','ref','area','ang'];
+const num=(v,d=0)=>Number.isFinite(+v)?+v:d, nrm=v=>Math.min(1,Math.max(0,num(v)));
+const pt=p=>({x:nrm(p&&p.x),y:nrm(p&&p.y)});
+function sanEl(e){
+  if(!e||typeof e!=='object') return null;
+  const t=e.tipo||(Array.isArray(e.pontos)?'livre':null);
+  if(!TIPOS_OK.includes(t)) return null;
+  const o={id:uid(),tipo:t};
+  if(COR_OK.test(e.cor)) o.cor=e.cor;
+  if(e.esp!=null) o.esp=Math.min(12,Math.max(.5,num(e.esp,2.5)));
+  if(['cota','linha','ret','circ','ref','ang'].includes(t)){ o.a=pt(e.a); o.b=pt(e.b); }
+  if(t==='ang'){ o.c=pt(e.c); o.deg=Math.min(360,Math.max(0,num(e.deg))); }
+  if(t==='cota'||t==='ref'){
+    const m=String(e.mm).replace(',','.'); if(!/^\d+(\.\d+)?$/.test(m)||parseFloat(m)<=0) return null;
+    o.mm=m; if(t==='cota'&&e.nome) o.nome=String(e.nome).slice(0,80);
+  }
+  if(t==='texto'){ o.p=pt(e.p); o.txt=String(e.txt==null?'':e.txt).slice(0,200); }
+  if(t==='livre'||t==='area'){
+    if(!Array.isArray(e.pontos)||e.pontos.length<(t==='area'?3:2)) return null;
+    o.pontos=e.pontos.slice(0,5000).map(pt);
+  }
+  return o;
+}
+function sanElementos(a){ return (Array.isArray(a)?a:[]).slice(0,5000).map(sanEl).filter(Boolean); }
+function sanearBackup(o){
+  if(!o||typeof o!=='object'||!o.dados||typeof o.dados!=='object'||!Array.isArray(o.fotos)||!Array.isArray(o.elementos)) return null;
+  const e=novoEstado(), s=(v,n)=>String(v==null?'':v).slice(0,n), d=o.dados;
+  e.dados={obra:s(d.obra,200),local:s(d.local,200),tecnico:s(d.tecnico,200),data:/^\d{4}-\d{2}-\d{2}$/.test(d.data||'')?d.data:e.dados.data,obs:s(d.obs,5000)};
+  e.ar=num(o.ar,1)>0.2&&num(o.ar,1)<5?num(o.ar,1):1;
+  e.elementos=sanElementos(o.elementos);
+  let descartadas=0;
+  o.fotos.slice(0,300).forEach(f=>{
+    if(!f||typeof f.data!=='string'||f.data.length>25e6||!IMG_OK.test(f.data)){ descartadas++; return; }
+    e.fotos.push({id:uid(),data:f.data,em:num(f.em,Date.now()),elementos:sanElementos(f.elementos)});
+  });
+  return {e,descartadas};
+}
 $('inpBackup').addEventListener('change',e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  if(f.size>400*1048576){ toast('Arquivo grande demais.'); return; }
   const r=new FileReader();
-  r.onload=()=>{ try{
-      const o=JSON.parse(r.result);
-      if(!o||!o.dados||!Array.isArray(o.fotos)||!Array.isArray(o.elementos)) throw new Error('formato');
-      if(!confirm('Importar este registro e substituir o atual?')) return;
-      estado=o; estado.v=4; banco.reset=true; pCroqui.zerar(); pintaDados(); renderFotos(); pCroqui.redesenhar(); salvar(); toast('Backup importado.');
-    }catch(err){ toast('Arquivo de backup inválido.'); } };
+  r.onload=async()=>{
+    let o=null; try{ o=JSON.parse(r.result); }catch(err){}
+    const s=sanearBackup(o);
+    if(!s){ toast('Arquivo de backup inválido.'); return; }
+    await salvar();
+    estado=s.e; regId=uid(); banco.novas=new Set(estado.fotos.map(x=>x.id)); banco.apagadas.clear();
+    estado.dados.obra=(estado.dados.obra||'Sem nome')+' (importado)';
+    await salvar(); aplicarEstado(); irAba('registros');
+    toast('Backup importado como novo registro'+(s.descartadas?' — '+s.descartadas+' foto(s) inválida(s) ignorada(s)':'')+'.');
+  };
+  r.onerror=()=>toast('Não foi possível ler o arquivo.');
   r.readAsText(f);
 });
 
 /* ---------- início ---------- */
+async function migrarLegado(){
+  /* versões antigas guardavam um único registro em 'estado' (ou localStorage) */
+  let leg=await banco.get('estado');
+  if(!leg&&banco.modo==='local'){ try{ leg=JSON.parse(localStorage.getItem('metria_estado')||'null'); }catch(e){} }
+  if(!leg||!leg.dados) return;
+  const id=uid(), e=Object.assign(novoEstado(),leg); e.dados=Object.assign(novoEstado().dados,leg.dados);
+  e.elementos=Array.isArray(leg.elementos)?leg.elementos:[]; e.fotos=Array.isArray(leg.fotos)?leg.fotos:[];
+  const puts=[]; e.fotos.forEach(f=>{ if(f.data) puts.push(['foto:'+f.id,f.data]); });
+  const meta=Object.assign({},e,{v:5,fotos:e.fotos.map(f=>({id:f.id,em:f.em,elementos:f.elementos||[]}))});
+  puts.push(['reg:'+id,meta]);
+  indice=[{id,obra:e.dados.obra||'',local:e.dados.local||'',data:e.dados.data||'',upd:Date.now(),nf:e.fotos.length,nm:contaMed(e)}];
+  puts.push(['idx',indice],['ultimo',id]);
+  await banco.tx(puts,['estado']);
+  if(banco.modo==='local') localStorage.removeItem('metria_estado');
+}
 async function iniciar(){
   await banco.abrir();
-  const salvo=await banco.ler();
-  if(salvo&&salvo.dados){
-    estado=Object.assign(novoEstado(),salvo);
-    estado.dados=Object.assign(novoEstado().dados,salvo.dados);
-    if(banco.modo==='idb'&&(salvo.v||0)<4){ estado.v=4; banco.reset=true; salvar(); } /* migra fotos do formato antigo */
-    estado.v=4;
-  }
-  pintaDados(); renderFotos(); ajustarCroqui();
+  indice=(await banco.get('idx'))||[];
+  if(!indice.length) await migrarLegado();
+  let id=await banco.get('ultimo');
+  if(!indice.find(r=>r.id===id)) id=indice[0]&&indice[0].id;
+  if(!(id&&await abrirReg(id,true))){ estado=novoEstado(); regId=uid(); await salvar(); aplicarEstado(); }
+  ajustarCroqui();
 }
 function aoRedimensionar(){ requestAnimationFrame(()=>{ ajustarCroqui(); ajustarEditor(); }); }
 window.addEventListener('resize',aoRedimensionar);
